@@ -1,0 +1,21 @@
+.scrollable {
+    min-height: 300px;
+    height: auto;
+    max-height: 457px;
+    overflow:hidden;
+    overflow-y:scroll;
+}
+
+.scrollable::-webkit-scrollbar {
+    display: none;
+}
+
+.uploadBox {
+    position: absolute;
+    background: lightblue;
+    width: 300px;
+    height: 200px;
+}
+.imageUploadInput {
+    display: none;
+}
