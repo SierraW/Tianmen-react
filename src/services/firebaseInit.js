@@ -22,6 +22,7 @@ function timestamp(date = new Date()) {
 
 export {
   db,
+  em_chat,
   em_room,
   em_mashaji,
   timestamp
