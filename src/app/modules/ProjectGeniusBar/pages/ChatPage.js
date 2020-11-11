@@ -1,8 +1,8 @@
 import React from "react";
-import { datePrettyPrint } from "../../services/datePrintingService";
-import { em_mashaji, timestamp } from "../../services/firebaseInit";
+import { datePrettyPrint } from "../../../../services/datePrintingService";
+import { em_mashaji, timestamp } from "../../../../services/firebaseInit";
 import axios from "axios";
-import "../../style/home.css";
+import "../style/home.css";
 
 
 class ChatPage extends React.Component {

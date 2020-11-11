@@ -20,7 +20,7 @@ export const MyProjectsPage = () => {
       querySnapshot.forEach(function (doc) {
         rooms.push({
           id: doc.id,
-          imgUri: doc.data().imgUri,
+          imgUri: doc.data().head,
           attenders: doc.data().attenders,
           expired: doc.data().expired,
           last_act_time: doc.data().last_act_time.toDate(),

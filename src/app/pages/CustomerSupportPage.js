@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSubheader } from "../../_metronic/layout";
 import { LayoutSplashScreen } from "../../_metronic/layout";
 import { useSelector } from "react-redux";
-import ChatPage from "./ChatPage";
+import ChatPage from "../modules/ProjectGeniusBar/pages/ChatPage";
 
 export const CustomerSupportPage = () => {
     const suhbeader = useSubheader();

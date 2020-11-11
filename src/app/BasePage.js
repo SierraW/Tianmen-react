@@ -31,7 +31,7 @@ export default function BasePage() {
         <ContentRoute path="/project-manager" component={ProjectManagerPage} />
         <Route path="/support" component={CustomerSupportPage} />
         <Route path="/user-profile" component={UserProfilepage} />
-        <Route path="/project-creator" component={ProjectCreatorPage} />
+        <Route path="/project-creator/:id" component={ProjectCreatorPage} />
         <Redirect to="error/error-v1" />
       </Switch>
     </Suspense>

@@ -27,7 +27,7 @@ export default function EmptyProjectCard() {
                 />
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                        Empty
+                        You don't have any project, yet.
                     </Typography>
                     <Typography variant="body2" color="textSecondary" component="p">
                         Awaiting invitation...
