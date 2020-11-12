@@ -1,9 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProjectManagerTableItem from "./PMTableItem";
 import ProjectManagerTableSearchBar from "./PMTableSearchBar";
 import { NavLink } from "react-router-dom";
+import { em_chat } from "../../../../services/firebaseInit"
 
 export default function ProjectManagerTable({ className }) {
+
+  const [items, setItems] = useState([]);
+
+  useEffect(() => {
+    em_chat.orderBy("time", "desc").get().then((querySnapshot) => {
+      var result = [];
+      querySnapshot.forEach((doc) => {
+        result.push({
+          id: doc.id,
+          name: doc.data().name,
+          type: doc.data().type
+        })
+      })
+      setItems(result);
+    })
+  }, [])
+
   return (
     <div className={`card card-custom ${className}`}>
       {/* Head */}
@@ -30,9 +48,9 @@ export default function ProjectManagerTable({ className }) {
                 </tr>
               </thead>
               <tbody>
-                <ProjectManagerTableItem></ProjectManagerTableItem>
-                <ProjectManagerTableItem></ProjectManagerTableItem>
-                <ProjectManagerTableItem></ProjectManagerTableItem>
+                {items.map(item => (
+                  <ProjectManagerTableItem key={item.id} roomId={item.id} name={item.name} type={item.type}></ProjectManagerTableItem>
+                ))}
               </tbody>
             </table>
           </div>

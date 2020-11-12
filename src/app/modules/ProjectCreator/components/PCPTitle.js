@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useFormik } from "formik";
+import { useFormik, produce } from "formik";
 import * as Yup from "yup";
 import PropTypes from 'prop-types';
 import Badge from 'react-bootstrap/Badge';
@@ -8,12 +8,29 @@ import { ModalProgressBar } from "../../../../_metronic/_partials/controls";
 import Switch from '@material-ui/core/Switch';
 import { em_chat, em_room, timestamp } from '../../../../services/firebaseInit';
 import VCModal from "../../Modal/VCModal";
+import Grow from '@material-ui/core/Grow';
 
-export default function ProjectCreatorPageTitle({ title, selectedUsers, removeSelectAt }) {
+export default function ProjectCreatorPageTitle({ roomData, selectedUsers, removeSelectAt }) {
     const defaultHead = "http://tianmengroup.com/server/projectimages/blank.png";
     const [loading, setloading] = useState(false);
     const [pic, setPic] = useState(defaultHead);
     const [modalValuesLength, setModalValuesLength] = useState(false);
+    const [initialValues, setValues] = useState({
+        expiry: false,
+        name: "",
+        type: "",
+    });
+
+    useEffect(() => {
+        if (roomData.id.length === 20) {
+            setPic(roomData.head);
+            formik.setValues({
+                expiry: roomData.expiry,
+                name: roomData.name,
+                type: roomData.type
+            });
+        }
+    }, [roomData])
 
     const submit = (values, setStatus, setSubmitting) => {
         if (selectedUsers.length < 2) {
@@ -31,7 +48,6 @@ export default function ProjectCreatorPageTitle({ title, selectedUsers, removeSe
                 expiry: values.expiry,
                 name: values.name,
                 type: values.type,
-                last_act_time: timestamp(),
                 time: timestamp(),
                 attenders: selectedUsers.map(user => parseInt(user.id))
             })
@@ -54,11 +70,6 @@ export default function ProjectCreatorPageTitle({ title, selectedUsers, removeSe
         }, 1000);
     };
     // UI Helpers
-    const initialValues = {
-        expiry: false,
-        name: "",
-        type: "",
-    };
     const Schema = Yup.object().shape({
         expiry: Yup.bool(),
         name: Yup.string().required("Required").test("empty-test", "Name must be at least 4 characters", name => !/^\s*$/.test(name) && String(name).length > 3),
@@ -107,7 +118,7 @@ export default function ProjectCreatorPageTitle({ title, selectedUsers, removeSe
         >
             <div className="card-header d-flex justify-content-between">
                 <h3 className="card-title">
-                    {title}
+                    {roomData.id.length === 20 ? `Project id: ${roomData.id}` : "New Project"}
                 </h3>
                 <button
                     type="submit"
@@ -246,9 +257,11 @@ export default function ProjectCreatorPageTitle({ title, selectedUsers, removeSe
                                 selectedUsers.length === 0 ? (<Button variant="outline-secondary" size="sm" className="mr-3 my-3" disabled>
                                     Empty <Badge variant="light">NoMember</Badge>
                                 </Button>) : selectedUsers.map(user => (
-                                    <Button variant="outline-primary" size="sm" key={user.login} className="mr-3 my-3" onClick={event => removeSelectAt(event, user.login)}>
-                                        {user.name} <Badge variant="light">{user.login}</Badge>
-                                    </Button>
+                                    <Grow key={user.login} in={true}>
+                                        <Button variant="outline-primary" size="sm" className="mr-3 my-3" onClick={event => removeSelectAt(event, user.login)}>
+                                            {user.name} <Badge variant="light">{user.login}</Badge>
+                                        </Button>
+                                    </Grow>
                                 ))
                             }
                         </div>
@@ -263,7 +276,7 @@ export default function ProjectCreatorPageTitle({ title, selectedUsers, removeSe
 }
 
 ProjectCreatorPageTitle.propTypes = {
-    title: PropTypes.string.isRequired,
+    roomData: PropTypes.object.isRequired,
     selectedUsers: PropTypes.array.isRequired,
     removeSelectAt: PropTypes.func.isRequired
 }
