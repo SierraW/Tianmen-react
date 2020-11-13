@@ -3,15 +3,14 @@ import { datePrettyPrint } from "../../../../services/datePrintingService";
 import { em_mashaji, timestamp } from "../../../../services/firebaseInit";
 import axios from "axios";
 import "../style/home.css";
+import PropTypes from "prop-types";
 
 
-export default function ChatPage({ roomId, uid }) {
+export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
 
     const [messages, setMessages] = useState([]);
     const [inputMsg, setInputMsg] = useState("");
-    const [users, setUsers] = useState({});
     var map = {};
-    const [userInfoUpdateArr, setUserInfoUpdateArr] = useState([]);
     const buttonRef = useRef();
 
     var scrollToBottom = () => {
@@ -19,18 +18,18 @@ export default function ChatPage({ roomId, uid }) {
             behavior: "smooth",
             block: "nearest",
             inline: "start"
-          });
+        });
     }
 
-    function sendMessage(type = null) {
-        if (/$\s*^/.test(inputMsg)) {
+    function sendMessage(body = null, type = null) {
+        if (!body && /$\s*^/.test(inputMsg)) {
             alert("no empty message allowed");
             setInputMsg("");
             return;
         }
         em_mashaji(roomId).add({
             display: true,
-            message: inputMsg,
+            message: body ? body : inputMsg,
             sender: uid,
             time: timestamp(),
             type: type ? type : 1
@@ -59,9 +58,6 @@ export default function ChatPage({ roomId, uid }) {
                     time: datePrettyPrint(doc.data().time.toDate()),
                     type: doc.data().type
                 })
-                if (!users[doc.data().sender] && !userInfoUpdateArr.includes(doc.data().sender)) {
-                    setUserInfoUpdateArr([...userInfoUpdateArr, doc.data().sender])
-                }
             })
             setMessages(items);
             scrollToBottom();
@@ -78,28 +74,13 @@ export default function ChatPage({ roomId, uid }) {
                 return;
             }
             e.preventDefault();
-            sendMessage(1);
+            sendMessage();
         }
     }
 
     useEffect(() => {
         scrollToBottom();
-        if (userInfoUpdateArr.length != 0) {
-            updateUserInfo();
-        }
     }, [messages]);
-
-    function updateUserInfo() {
-        var updatedUserMap = { ...users }
-        userInfoUpdateArr.forEach(uid => {
-            axios.get(`http://tianmengroup.com/server/socket/getDisplayName.php?uid=${uid}`)
-                .then(({ data }) => {
-                    updatedUserMap[uid] = data.data.display_name
-                })
-        })
-        console.log(updatedUserMap);
-        setUsers(updatedUserMap);
-    }
 
     function renderMessage(type, msgBody) {
         switch (type) {
@@ -110,6 +91,48 @@ export default function ChatPage({ roomId, uid }) {
             case 3:
                 return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} download>附件: {msgBody}</a></div>;
         }
+    }
+
+    function headUri(data) {
+        if (data) {
+            return `http://tianmengroup.com/server/heads/${data.head}`;
+        } else {
+            return `http://tianmengroup.com/server/heads/blank.png`;
+        }
+    }
+
+    function nameString(data) {
+        if (data) {
+            return data.name;
+        } else {
+            return "";
+        }
+    }
+
+    const uploadFile = (event) => {
+        const file = event.target.files[0];
+
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append("session", session);
+        formData.append("target", "uploads");
+
+        setTimeout(() => {
+            axios
+                .post("http://tianmengroup.com/server/universalUpload.php", formData)
+                .then(({ data }) => {
+                    if (data.success === "success") {
+                        sendMessage( data.uri, data.type);
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(() => {
+                    alert("Upload failed");
+                });
+        }, 1000)
+
+
     }
 
 
@@ -134,7 +157,7 @@ export default function ChatPage({ roomId, uid }) {
             </div>
             <div className="text-center text-center">
                 <div className="symbol-group symbol-hover justify-content-center">
-                    <h3 style={{ margin: "1.2 rem" }}>Room Name</h3>
+                    <h3 style={{ margin: "1.2 rem" }}>{roomName}</h3>
                 </div>
             </div>
 
@@ -151,10 +174,10 @@ export default function ChatPage({ roomId, uid }) {
                         <div className={`d-flex flex-column mb-5 ${message.align}`} key={index}>
                             <div className="d-flex align-items-center">
                                 <div className="symbol symbol-circle symbol-35 mr-3">
-                                    <img alt="Pic" src="assets/media/users/300_12.jpg" />
+                                    <img alt="Pic" src={headUri(userInfo[message.sender])} />
                                 </div>
                                 <div>
-                                    <a href="#" className="text-dark-75 text-hover-primary font-weight-bold font-size-h6">{users[message.sender]}</a>
+                                    <a href="#" className="text-dark-75 text-hover-primary font-weight-bold font-size-h6 mr-3">{nameString(userInfo[message.sender])}</a>
                                     <span className="text-muted font-size-sm">{message.time}</span>
                                 </div>
                             </div>
@@ -178,7 +201,7 @@ export default function ChatPage({ roomId, uid }) {
         <div className="card-footer align-items-center">
 
 
-            <textarea className="form-control border-0 p-0" rows="2" placeholder="Type a message" onKeyDown={() => keyListner} onKeyUp={() => keyListner} value={inputMsg} onChange={() => handleChange} id="txtIn"></textarea>
+            <textarea className="form-control border-0 p-0" rows="2" placeholder="Type a message" onKeyDown={(event) => keyListner(event)} onKeyUp={(event) => keyListner(event)} value={inputMsg} onChange={(event) => handleChange(event)} id="txtIn"></textarea>
             <div className="d-flex align-items-center justify-content-between mt-5">
                 <div className="mr-3">
 
@@ -186,17 +209,25 @@ export default function ChatPage({ roomId, uid }) {
                         <input id="file" type="file" name="file" accept=".png, .jpg, .jpeg, .gif, .pdf, .pages, .doc, .docx, .zip" onchange="angular.element(this).scope().uploadFile(this.files)" />
                     </div> */}
 
-                    <a href="#" className="btn btn-clean btn-icon btn-md mr-1">
+                    <input
+                        type="file"
+                        name="file"
+                        accept=".png, .jpg, .jpeg, .gif, .pdf, .pages, .doc, .docx, .zip"
+                        onChange={uploadFile}
+                    />
+
+                    {/* <a href="#" className="btn btn-clean btn-icon btn-md mr-1">
                         <i className="flaticon2-photograph icon-lg"></i>
                     </a>
+                    
 
                     <a href="#" className="btn btn-clean btn-icon btn-md">
                         <i className="flaticon2-photo-camera icon-lg"></i>
-                    </a>
+                    </a> */}
 
                 </div>
                 <div>
-                    <button type="button" className="btn btn-primary btn-md text-uppercase font-weight-bold chat-send py-2 px-6" onClick={() => sendMessage(1)}>Send</button>
+                    <button type="button" className="btn btn-primary btn-md text-uppercase font-weight-bold chat-send py-2 px-6" onClick={() => sendMessage()}>Send</button>
                 </div>
             </div>
 
@@ -206,4 +237,12 @@ export default function ChatPage({ roomId, uid }) {
     </>
 
 
+}
+
+ChatPage.propTypes = {
+    roomName: PropTypes.string.isRequired,
+    roomId: PropTypes.string.isRequired,
+    uid: PropTypes.number.isRequired,
+    session: PropTypes.string.isRequired,
+    userInfo: PropTypes.object.isRequired
 }

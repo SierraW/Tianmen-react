@@ -33,7 +33,7 @@ export const ProjectCreatorPage = ({ match }) => {
                             return createData(user.id, user.display_name, user.user_login, user.company_name, false);
                         }));
                     } else {
-                        alert("wrong!");
+                        alert("session expired!");
                     }
                 })
             if (match.params.id.length === 20) {
@@ -44,7 +44,7 @@ export const ProjectCreatorPage = ({ match }) => {
                         name: doc.data().name,
                         type: doc.data().type,
                         expiry: doc.data().expiry,
-                        attenders: doc.data().attenders
+                        attendees: doc.data().attendees
                     });
                 })
             }
@@ -57,7 +57,7 @@ export const ProjectCreatorPage = ({ match }) => {
 
     useEffect(() => {
         setUsers(users.map(user => {
-            if (roomData.attenders.includes(parseInt(user.id))) {
+            if (roomData.attendees.includes(parseInt(user.id))) {
                 return { ...user, isSelected: true };
             } else {
                 return user;
@@ -89,7 +89,7 @@ export const ProjectCreatorPage = ({ match }) => {
         return <>
             <div className="row">
                 <div className="col-lg-12">
-                    <ProjectCreatorPageTitle roomData={roomData} selectedUsers={selectedUsers} removeSelectAt={selectUser}></ProjectCreatorPageTitle>
+                    <ProjectCreatorPageTitle session={user.user_session} roomData={roomData} selectedUsers={selectedUsers} removeSelectAt={selectUser}></ProjectCreatorPageTitle>
                 </div>
                 <div className="col-lg-4">
                     <EnhancedTable users={users} selectUser={selectUser} tableTitle="Users sorted by name" defaultOrderBy="name"></EnhancedTable>

@@ -15,15 +15,14 @@ export const MyProjectsPage = () => {
   const uid = useSelector((state) => state.auth.user.id);
 
   useEffect(() => {
-    em_chat.where("attenders", "array-contains", uid).onSnapshot(function (querySnapshot) {
+    var unsubscribe = em_chat.where("attendees", "array-contains", uid).onSnapshot(function (querySnapshot) {
       let rooms = [];
       querySnapshot.forEach(function (doc) {
         rooms.push({
           id: doc.id,
           imgUri: doc.data().head,
-          attenders: doc.data().attenders,
+          attendees: doc.data().attendees,
           expired: doc.data().expired,
-          last_act_time: doc.data().last_act_time.toDate(),
           name: doc.data().name,
           type: doc.data().type,
           time: doc.data().time
@@ -32,6 +31,9 @@ export const MyProjectsPage = () => {
       setProjects(rooms);
       setLoading(false);
     });
+    return function cleanup() {
+      unsubscribe();
+    };
   }, [])
 
   const emptyCard = () => {

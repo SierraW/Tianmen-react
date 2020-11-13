@@ -4,16 +4,19 @@ import * as Yup from "yup";
 import PropTypes from 'prop-types';
 import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
+import Spinner from 'react-bootstrap/Spinner';
 import { ModalProgressBar } from "../../../../_metronic/_partials/controls";
 import Switch from '@material-ui/core/Switch';
 import { em_chat, em_room, timestamp } from '../../../../services/firebaseInit';
 import VCModal from "../../Modal/VCModal";
 import Grow from '@material-ui/core/Grow';
+import axios from "axios";
 
-export default function ProjectCreatorPageTitle({ roomData, selectedUsers, removeSelectAt }) {
-    const defaultHead = "http://tianmengroup.com/server/projectimages/blank.png";
+export default function ProjectCreatorPageTitle({ session, roomData, selectedUsers, removeSelectAt }) {
+    const defaultHead = "url(http://tianmengroup.com/server/projectimages/blank.png)";
     const [loading, setloading] = useState(false);
-    const [pic, setPic] = useState(defaultHead);
+    const [loadingImg, setLoadingImg] = useState(false);
+    const [pic, setPic] = useState("");
     const [modalValuesLength, setModalValuesLength] = useState(false);
     const [initialValues, setValues] = useState({
         expiry: false,
@@ -43,19 +46,36 @@ export default function ProjectCreatorPageTitle({ roomData, selectedUsers, remov
 
         //dispatch(props.setUser(updatedUser));
         setTimeout(() => {
-            em_chat.add({
-                head: pic,
-                expiry: values.expiry,
-                name: values.name,
-                type: values.type,
-                time: timestamp(),
-                attenders: selectedUsers.map(user => parseInt(user.id))
-            })
-                .then(() => {
-                    console.log("success!!!!!!");
-                    setloading(false);
-                    setSubmitting(false);
+            if (roomData.id.length === 20) {
+                em_chat.doc(roomData.id).set({
+                    head: pic,
+                    expiry: values.expiry,
+                    name: values.name,
+                    type: values.type,
+                    time: timestamp(),
+                    attendees: selectedUsers.map(user => parseInt(user.id))
                 })
+                    .then(() => {
+                        alert("success!");
+                        setloading(false);
+                        setSubmitting(false);
+                    })
+            } else {
+                em_chat.add({
+                    head: pic,
+                    expiry: values.expiry,
+                    name: values.name,
+                    type: values.type,
+                    time: timestamp(),
+                    attendees: selectedUsers.map(user => parseInt(user.id))
+                })
+                    .then(() => {
+                        alert("success!");
+                        setloading(false);
+                        setSubmitting(false);
+                    })
+            }
+            
 
             // Do request to your server for user update, we just imitate user update there, For example:
             // update(updatedUser)
@@ -98,16 +118,43 @@ export default function ProjectCreatorPageTitle({ roomData, selectedUsers, remov
     });
 
     const getProjectPic = () => {
-        if (!pic) {
+        if (!pic || pic === "") {
             return defaultHead;
         }
-        return `url(${pic})`;
+        return `url(http://tianmengroup.com/server/projectimages/${pic})`;
     };
     const removePic = () => {
-        setPic(defaultHead);
+        setPic("");
     };
     const handleChange = (event) => {
-        setPic(URL.createObjectURL(event.target.files[0]))
+        setLoadingImg(true);
+        const file = event.target.files[0];
+
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append("session", session);
+        formData.append("target", "projectimages");
+
+        setTimeout(() => {
+            axios
+            .post("http://tianmengroup.com/server/universalUpload.php", formData)
+            .then(({ data }) => {
+                if (data.success === "success") {
+                    setPic(data.data);
+                } else {
+                    setPic("");
+                    alert(data.message);
+                }
+                setLoadingImg(false);
+            })
+            .catch(() => {
+                setPic("");
+                alert("Upload failed");
+                setLoadingImg(false);
+            });
+        }, 1000)
+
+        
     }
 
     return <>
@@ -149,10 +196,13 @@ export default function ProjectCreatorPageTitle({ roomData, selectedUsers, remov
                                             backgroundColor: "white"
                                         }}
                                     >
-                                        <div
+                                        {loadingImg ? (<Spinner animation="border" role="status">
+                                            <span className="sr-only">Loading...</span>
+                                        </Spinner>) : (<div
                                             className="image-input-wrapper"
                                             style={{ backgroundImage: `${getProjectPic()}` }}
-                                        />
+                                        />)}
+
                                         <label
                                             className="btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow"
                                             data-action="change"
@@ -276,6 +326,7 @@ export default function ProjectCreatorPageTitle({ roomData, selectedUsers, remov
 }
 
 ProjectCreatorPageTitle.propTypes = {
+    session: PropTypes.string.isRequired,
     roomData: PropTypes.object.isRequired,
     selectedUsers: PropTypes.array.isRequired,
     removeSelectAt: PropTypes.func.isRequired

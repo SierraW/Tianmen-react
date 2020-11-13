@@ -20,7 +20,7 @@ export default function ProjectManagerTableItem({ roomId, name, type }) {
     const history = useHistory();
     // numOfNewMsgs, lastMsgBody, lastMsgName, attendersFs, attendersCus
     useEffect(() => {
-        em_room(roomId).collection("em_messages").orderBy("time", "desc").limit(1).onSnapshot((querySnapshot) => {
+        var unsubscribe = em_room(roomId).collection("em_messages").orderBy("time", "desc").limit(1).onSnapshot((querySnapshot) => {
             if (querySnapshot.size > 0) {
                 querySnapshot.forEach(doc => {
                     setLastMsg({
@@ -32,6 +32,9 @@ export default function ProjectManagerTableItem({ roomId, name, type }) {
                 setLastMsg({ body: "", name: "" })
             }
         })
+        return function cleanup() {
+            unsubscribe();
+        };
     }, [])
 
     var enterProject = function () {
