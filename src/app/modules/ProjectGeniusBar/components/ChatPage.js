@@ -14,11 +14,13 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     const buttonRef = useRef();
 
     var scrollToBottom = () => {
-        buttonRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "nearest",
-            inline: "start"
-        });
+        if (buttonRef.current.scrollIntoView) {
+            buttonRef.current.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+                inline: "start"
+            });
+        }
     }
 
     function sendMessage(body = null, type = null) {
@@ -94,7 +96,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     }
 
     function headUri(data) {
-        if (data) {
+        if (data && data.head !== null) {
             return `http://tianmengroup.com/server/heads/${data.head}`;
         } else {
             return `http://tianmengroup.com/server/heads/blank.png`;
