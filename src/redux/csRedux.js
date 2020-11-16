@@ -1,7 +1,6 @@
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { put, takeEvery, call } from "redux-saga/effects";
-import { timestamp } from "../services/firebaseInit"
 
 export const actionTypes = {
   SetRoom: "[CS] SetRoom",
@@ -19,10 +18,10 @@ export const reducer = persistReducer(
   (state = initialState, action) => {
     switch (action.type) {
       case actionTypes.SetRoom: {
-        return { id: action.payload };
+        return { ...state, id: action.payload };
       }
       case actionTypes.StoreLastViewStamp: {
-        return { ...state.lastViewStamp, [action.payload.uid]: action.payload.timestamp }
+        return { ...state, lastViewStamp: {...state.lastViewStamp, [action.payload.pid]: action.payload.timestamp} }
       }
       default:
         return state;
@@ -32,8 +31,8 @@ export const reducer = persistReducer(
 
 export const actions = {
   setRoom: (id) => ({ type: actionTypes.SetRoom, payload: id }),
-  setLastViewStamp: (uid) => ({ type: actionTypes.SetLastViewStamp, payload: uid }),
-  storeLastViewStamp: (uid, timestamp) => ({ type: actionTypes.StoreLastViewStamp, payload: {uid, timestamp} })
+  setLastViewStamp: (pid) => ({ type: actionTypes.SetLastViewStamp, payload: {pid} }),
+  storeLastViewStamp: (pid, timestamp) => ({ type: actionTypes.StoreLastViewStamp, payload: {pid, timestamp} })
 };
 
 export function* saga() {
@@ -41,6 +40,6 @@ export function* saga() {
 }
 
 function* fetchLVR(action) {
-  const now = yield call(timestamp);
-  yield put(actions.storeLastViewStamp(action.payload, now));
+  const now = yield call(Date.now);
+  yield put(actions.storeLastViewStamp(action.payload.pid, now));
 }

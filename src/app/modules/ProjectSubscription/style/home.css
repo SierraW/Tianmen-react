@@ -1,0 +1,4 @@
+.scrollable {
+    overflow:hidden;
+    overflow-x:scroll;
+}

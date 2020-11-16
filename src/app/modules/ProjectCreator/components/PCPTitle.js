@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useFormik, produce } from "formik";
+import { useFormik } from "formik";
 import * as Yup from "yup";
 import PropTypes from 'prop-types';
 import Badge from 'react-bootstrap/Badge';
@@ -7,10 +7,11 @@ import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 import { ModalProgressBar } from "../../../../_metronic/_partials/controls";
 import Switch from '@material-ui/core/Switch';
-import { em_chat, em_room, timestamp } from '../../../../services/firebaseInit';
+import { em_chat, timestamp } from '../../../../services/firebaseInit';
 import VCModal from "../../Modal/VCModal";
 import Grow from '@material-ui/core/Grow';
 import axios from "axios";
+import { NavLink } from "react-router-dom";
 
 export default function ProjectCreatorPageTitle({ session, roomData, selectedUsers, removeSelectAt }) {
     const defaultHead = "url(http://tianmengroup.com/server/projectimages/blank.png)";
@@ -75,7 +76,7 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
                         setSubmitting(false);
                     })
             }
-            
+
 
             // Do request to your server for user update, we just imitate user update there, For example:
             // update(updatedUser)
@@ -137,24 +138,24 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
 
         setTimeout(() => {
             axios
-            .post("http://tianmengroup.com/server/universalUpload.php", formData)
-            .then(({ data }) => {
-                if (data.success === "success") {
-                    setPic(data.data);
-                } else {
+                .post("http://tianmengroup.com/server/universalUpload.php", formData)
+                .then(({ data }) => {
+                    if (data.success === "success") {
+                        setPic(data.data);
+                    } else {
+                        setPic("");
+                        alert(data.message);
+                    }
+                    setLoadingImg(false);
+                })
+                .catch(() => {
                     setPic("");
-                    alert(data.message);
-                }
-                setLoadingImg(false);
-            })
-            .catch(() => {
-                setPic("");
-                alert("Upload failed");
-                setLoadingImg(false);
-            });
+                    alert("Upload failed");
+                    setLoadingImg(false);
+                });
         }, 1000)
 
-        
+
     }
 
     return <>
@@ -286,6 +287,13 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
                                     ) : null}
                                 </div>
                             </div>
+
+                            <NavLink to={`/sm/${roomData.id}`}>
+                                <Button variant="primary" size="lg" className="mt-10">
+                                    Manage subscription & payment
+                                </Button>
+                            </NavLink>
+
                         </div>
                         <div className="col-xl-6 col-lg-6">
                             <div className="row">

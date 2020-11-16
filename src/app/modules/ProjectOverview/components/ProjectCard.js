@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as cs from "../../../../redux/csRedux";
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,6 +11,7 @@ import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import { em_mashaji, timestamp } from "../../../../services/firebaseInit";
 
 const useStyles = makeStyles({
     media: {
@@ -22,10 +23,43 @@ export default function ProjectCard({ imgUri, name, type, roomId }) {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
+    const [unreadCount, setUnreadCount] = useState(0);
 
     var enterProject = function () {
         dispatch(cs.actions.setRoom(roomId));
         history.push("/support");
+    }
+
+    var myTimestamp = timestamp();
+
+    const lvs = useSelector((state) => state.cs.lastViewStamp);
+    if (lvs[roomId]) {
+        const myDate = new Date(lvs[roomId]);
+        myTimestamp = timestamp(myDate);
+    }
+
+    useEffect(() => {
+        em_mashaji(roomId).where("time", ">=", myTimestamp).onSnapshot(querySnapshot => {
+            setUnreadCount(querySnapshot.size);
+        })
+    }, []);
+
+    function getMessageNotificationCountString() {
+        if (unreadCount === 0) {
+            return "No new message";
+        } else if (unreadCount === 1) {
+            return `${unreadCount} unread message`
+        } else {
+            return `${unreadCount} unread messages`
+        }
+    }
+
+    function getMessageNotificationCountColor() {
+        if (unreadCount === 0) {
+            return "text-muted";
+        } else {
+            return "text-danger font-weight-bold"
+        }
     }
 
     return (
@@ -49,9 +83,10 @@ export default function ProjectCard({ imgUri, name, type, roomId }) {
                 <Button size="small" color="primary" onClick={enterProject}>
                     ENTER
         </Button>
-                <Button size="small" color="primary" disabled>
-                    No new message
-        </Button>
+                <div className="d-flex align-items-center justify-content-center"><span className={getMessageNotificationCountColor()}>
+                    {getMessageNotificationCountString()}
+                </span></div>
+
             </CardActions>
         </Card>
     );

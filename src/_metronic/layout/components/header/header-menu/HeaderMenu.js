@@ -36,6 +36,15 @@ export function HeaderMenu({ layoutProps }) {
             {/*end::1 Level*/}
 
             {/*begin::1 Level*/}
+            <li className={`menu-item menu-item-rel ${getMenuItemActive('/subscription')}`}>
+                <NavLink className="menu-link" to="/subscription">
+                    <span className="menu-text">Browse</span>
+                    {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                </NavLink>
+            </li>
+            {/*end::1 Level*/}
+
+            {/*begin::1 Level*/}
             <li className={`menu-item menu-item-rel ${getMenuItemActive('/project-manager')}`}>
                 <NavLink className="menu-link" to="/project-manager">
                     <span className="menu-text">Project Manager</span>

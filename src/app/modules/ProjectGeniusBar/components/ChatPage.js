@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
+import * as cs from "../../../../redux/csRedux";
 import { datePrettyPrint } from "../../../../services/datePrintingService";
 import { em_mashaji, timestamp } from "../../../../services/firebaseInit";
 import axios from "axios";
@@ -12,6 +14,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     const [inputMsg, setInputMsg] = useState("");
     var map = {};
     const buttonRef = useRef();
+    const dispatch = useDispatch();
 
     var scrollToBottom = () => {
         if (buttonRef.current.scrollIntoView) {
@@ -49,6 +52,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     }
 
     useEffect(() => {
+        dispatch(cs.actions.setLastViewStamp(roomId));
         em_mashaji(roomId).orderBy("time").onSnapshot((querySnapshot) => {
             var items = []
             querySnapshot.forEach((doc) => {
@@ -62,7 +66,6 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
                 })
             })
             setMessages(items);
-            scrollToBottom();
         })
     }, [])
 

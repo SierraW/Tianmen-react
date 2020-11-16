@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { ListsWidget10, ListsWidget11 } from "../../../../_metronic/_partials/widgets";
+import ProjectOverviewWidgetNewsList from "../components/POWidgetNewsList";
+import ProjectOverviewWidgetNotificationsList from "../components/POWidgetNotificationsList";
 import { useSubheader } from "../../../../_metronic/layout";
 import { LayoutSplashScreen } from "../../../../_metronic/layout";
 import ProjectCard from "../components/ProjectCard";
-import { em_chat, timestamp } from "../../../../services/firebaseInit";
+import { em_chat } from "../../../../services/firebaseInit";
 import EmptyProjectCard from "../components/EmptyProjectCard";
 import { useSelector } from "react-redux";
 
@@ -52,10 +53,10 @@ export const MyProjectsPage = () => {
     return <>
       <div className="row">
         <div className="col-lg-6">
-          <ListsWidget10 className="card-stretch gutter-b" />
+          <ProjectOverviewWidgetNewsList className="card-stretch gutter-b" />
         </div>
         <div className="col-lg-6">
-          <ListsWidget11 className="card-stretch gutter-b" />
+          <ProjectOverviewWidgetNotificationsList className="card-stretch gutter-b" />
         </div>
 
         {

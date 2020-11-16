@@ -7,6 +7,8 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { CustomerSupportPage } from "./modules/ProjectGeniusBar/pages/CustomerSupportPage";
 import { ProjectCreatorPage } from "./modules/ProjectCreator/pages/ProjectCreatorPage";
 import { ProjectManagerPage } from "./modules/ProjectManager/pages/ProjectManagerPage";
+import { ProjectSubscriptionPage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionPage";
+import { ProjectSubscriptionManagerPage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionManagerPage";
 
 const UserProfilepage = lazy(() =>
   import("./modules/UserProfile/UserProfilePage")
@@ -29,10 +31,12 @@ export default function BasePage() {
         <ContentRoute path="/builder" component={BuilderPage} />
         <ContentRoute path="/projects" component={MyProjectsPage} />
         <ContentRoute path="/project-manager" component={ProjectManagerPage} />
+        <ContentRoute path="/subscription" component={ProjectSubscriptionPage} />
         <Route path="/support" component={CustomerSupportPage} />
         <Route path="/user-profile" component={UserProfilepage} />
         <Route path="/project-creator/:id" component={ProjectCreatorPage} />
-        <Redirect to="error/error-v1" />
+        <Route path="/sm/:id" component={ProjectSubscriptionManagerPage} />
+          <Redirect to="error/error-v1" />
       </Switch>
     </Suspense>
   );
