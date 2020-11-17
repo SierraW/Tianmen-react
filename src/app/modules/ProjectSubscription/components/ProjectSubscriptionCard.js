@@ -2,28 +2,30 @@ import React from "react";
 import PropTypes from "prop-types";
 import Button from 'react-bootstrap/Button';
 
-export default function ProjectSubscriptionCard({ className }) {
+export default function ProjectSubscriptionCard({ className, title, subtitle, desList, pid, price }) {
 
-
+    function subscribe() {
+        alert(`you've select ${pid}`);
+    }
 
     return <>
         <div className={className}>
             <div className="card card-custom">
                 <div className="card-body">
-                    <h2 >Monthly Plan.</h2>
-                    <p>For personal and small business</p>
+                    <h2 >{title}</h2>
+                    <p>{subtitle}</p>
                     <br />
                     <ul>
-                        <li>Personal / Small business website design.</li>
-                        <li>Free website hosting.</li>
-                        <li>Domain name email services.</li>
-                        <li>Server maintenance.</li>
+                        {
+                            desList.map((des, index) => (<li key={index}>{des}</li>))
+                        }
                     </ul>
                 </div>
-                <div className="card-footer">
-                    <Button variant="outline-primary" size="lg">
+                <div className="card-footer d-flex justify-content-between align-items-center">
+                    <Button variant="outline-primary" size="lg" onClick={() => subscribe()}>
                         Subscribe!
                     </Button>
+                    <span className="text-lg-center">{ price }</span>
                 </div>
             </div>
         </div>
@@ -31,5 +33,10 @@ export default function ProjectSubscriptionCard({ className }) {
 }
 
 ProjectSubscriptionCard.propTypes = {
-    className: PropTypes.string
+    className: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    subtitle: PropTypes.string.isRequired,
+    desList: PropTypes.array.isRequired,
+    pid: PropTypes.string.isRequired,
+    price: PropTypes.string.isRequired
 }
