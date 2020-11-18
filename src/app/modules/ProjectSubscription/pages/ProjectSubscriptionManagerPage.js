@@ -7,7 +7,7 @@ import { delay } from "../../../../services/delayLoading";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { em_room } from "../../../../services/firebaseInit"
-import "../style/home.css";
+import ProjectSubscriptionManagementPaymentWidget from "../components/PSMPaymentWidget";
 
 const pscards = [
     {
@@ -142,12 +142,12 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     } else {
         return <>
             <div className="my-6"><h1 className="text-light">For project: {match.params.id}</h1></div>
-            <div className="d-flex flex-row scrollable">
-                {
-                    psCards.map((card, index) => (<ProjectSubscriptionCard key={index} className="col-lg-4 my-4" title={card.title} subtitle={card.subtitle} desList={card.desList} pid={card.pid} price={card.price} />))
-                }
+            <div className="card">
+                <div className="card-body">
+                    <ProjectSubscriptionManagementPaymentWidget />
+                </div>
             </div>
-            <div className="card mx-4">
+            <div className="card mt-6">
                 <Form className="card-body" onSubmit={(e) => handleSubmit(e)}>
                     <Form.Group controlId="formPrice">
                         <Form.Label>
@@ -168,23 +168,23 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
 
                     <Form.Group controlId="formCH">
                         <Form.Label>Card Holder</Form.Label>
-                        <Form.Control value={cardHolder} onChange={(e) => setCardHolder(e.target.value)} type="text" placeholder="John Doe" />
+                        <Form.Control disabled value={cardHolder} onChange={(e) => setCardHolder(e.target.value)} type="text" placeholder="John Doe" />
                     </Form.Group>
 
                     <Form.Group controlId="formCN">
                         <Form.Label>Card Number</Form.Label>
-                        <Form.Control value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} type="text" placeholder="4111 1111 1111 1111" />
+                        <Form.Control disabled value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} type="text" placeholder="4111 1111 1111 1111" />
                         <Form.Text className="text-muted">
                             Visa and Mastercard Only.
                         </Form.Text>
                     </Form.Group>
                     <Form.Group controlId="formED">
                         <Form.Label>Expiry Date</Form.Label>
-                        <Form.Control value={cardExp} onChange={(e) => setCardExp(e.target.value)} type="text" placeholder="MM/YY" />
+                        <Form.Control disabled value={cardExp} onChange={(e) => setCardExp(e.target.value)} type="text" placeholder="MM/YY" />
                     </Form.Group>
                     <Form.Group controlId="formCVV">
                         <Form.Label>CVV</Form.Label>
-                        <Form.Control value={cardCVV} onChange={(e) => setCardCVV(e.target.value)} type="text" placeholder="xxx" />
+                        <Form.Control disabled value={cardCVV} onChange={(e) => setCardCVV(e.target.value)} type="text" placeholder="xxx" />
                     </Form.Group>
                     <Form.Group controlId="formCountry">
                         <Form.Label>Country</Form.Label>

@@ -41,9 +41,12 @@ export default function ProjectManagerTable({ className }) {
               <thead>
                 <tr className="text-left text-uppercase">
                   <th className="pl-7" style={{ minWidth: "80px" }}><span className="text-dark-75">Project</span></th>
-                  <th style={{ minWidth: "50px" }}></th>
-                  <th style={{ minWidth: "250px" }}>Last Message</th>
-                  <th style={{ minWidth: "200px" }}>Attender</th>
+                  <th style={{ minWidth: "50px" }}>Status</th>
+                  <th style={{ minWidth: "100px" }}>Since / Due</th>
+                  <th style={{ minWidth: "100px" }}>Delivered</th>
+                  <th style={{ minWidth: "100px" }}>Last Payment</th>
+                  <th style={{ minWidth: "100px" }}>Next Payment</th>
+                  <th style={{ minWidth: "100px" }}>Amount</th>
                   <th style={{ minWidth: "80px" }} />
                 </tr>
               </thead>

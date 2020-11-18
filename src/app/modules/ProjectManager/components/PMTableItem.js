@@ -7,34 +7,11 @@ import { em_room } from "../../../../services/firebaseInit";
 import * as cs from "../../../../redux/csRedux";
 
 export default function ProjectManagerTableItem({ roomId, name, type }) {
-    const [numOfNewMsg, setNumOfNewMsg] = useState(0);
-    const [lastMsg, setLastMsg] = useState({
-        body: "",
-        name: ""
-    });
-    const [attender, setAttender] = useState({
-        fs: [],
-        cus: []
-    });
     const dispatch = useDispatch();
     const history = useHistory();
     // numOfNewMsgs, lastMsgBody, lastMsgName, attendersFs, attendersCus
     useEffect(() => {
-        var unsubscribe = em_room(roomId).collection("em_messages").orderBy("time", "desc").limit(1).onSnapshot((querySnapshot) => {
-            if (querySnapshot.size > 0) {
-                querySnapshot.forEach(doc => {
-                    setLastMsg({
-                        body: doc.data().message,
-                        name: doc.data().sender
-                    })
-                })
-            } else {
-                setLastMsg({ body: "", name: "" })
-            }
-        })
-        return function cleanup() {
-            unsubscribe();
-        };
+
     }, [])
 
     var enterProject = function () {
@@ -61,26 +38,38 @@ export default function ProjectManagerTableItem({ roomId, name, type }) {
             </td>
             <td>
                 <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    {numOfNewMsg}
+                    制作中
                 </span>
                 <span className="text-muted font-weight-bold">
-                    新消息
-                      </span>
-            </td>
-            <td>
-                <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    {lastMsg.body}
-                </span>
-                <span className="text-muted font-weight-bold">
-                    {lastMsg.name}
+                    Nelson!
                 </span>
             </td>
             <td>
                 <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    {attender.cus.join(', ')}
+                    2020-01-01
                 </span>
                 <span className="text-muted font-weight-bold">
-                    {attender.fs.join(', ')}
+                    2020-02-02
+                </span>
+            </td>
+            <td>
+                <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
+                    TBD
+                </span>
+            </td>
+            <td>
+                <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
+                    2020-10-10
+                </span>
+            </td>
+            <td>
+                <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
+                    2020-11-10
+                </span>
+            </td>
+            <td>
+                <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
+                    $4000
                 </span>
             </td>
             <td className="pr-0 text-right">
