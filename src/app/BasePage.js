@@ -9,6 +9,8 @@ import { ProjectCreatorPage } from "./modules/ProjectCreator/pages/ProjectCreato
 import { ProjectManagerPage } from "./modules/ProjectManager/pages/ProjectManagerPage";
 import { ProjectSubscriptionPage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionPage";
 import { ProjectSubscriptionManagerPage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionManagerPage";
+import { MyProjectsManagePage } from "./modules/ProjectOverview/pages/MyProjectsManagePage";
+import { VersionPage } from "./modules/Version/pages/VersionPage";
 
 const UserProfilepage = lazy(() =>
   import("./modules/UserProfile/UserProfilePage")
@@ -27,16 +29,18 @@ export default function BasePage() {
           /* Redirect from root URL to /dashboard. */
           <Redirect exact from="/" to="/dashboard" />
         }
-        <ContentRoute path="/dashboard" component={DashboardPage} />
+        <ContentRoute path="/dashboard" component={MyProjectsPage} />
         <ContentRoute path="/builder" component={BuilderPage} />
         <ContentRoute path="/projects" component={MyProjectsPage} />
         <ContentRoute path="/project-manager" component={ProjectManagerPage} />
         <ContentRoute path="/subscription" component={ProjectSubscriptionPage} />
+        <ContentRoute path="/version" component={VersionPage} />
+        <Route path="/news-notifications-manager" component={MyProjectsManagePage} />
         <Route path="/support" component={CustomerSupportPage} />
         <Route path="/user-profile" component={UserProfilepage} />
         <Route path="/project-creator/:id" component={ProjectCreatorPage} />
         <Route path="/sm/:id" component={ProjectSubscriptionManagerPage} />
-          <Redirect to="error/error-v1" />
+        <Redirect to="error/error-v1" />
       </Switch>
     </Suspense>
   );

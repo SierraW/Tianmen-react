@@ -67,7 +67,7 @@ export default function ProjectCard({ imgUri, name, type, roomId }) {
             <CardActionArea onClick={enterProject}>
                 <CardMedia
                     className={classes.media}
-                    image={imgUri || /^\s*&/.test(imgUri) ? "http://tianmengroup.com/server/projectimages/0.png" : imgUri}
+                    image={imgUri || imgUri === "" || /^\s*&/.test(imgUri) ? "http://tianmengroup.com/server/projectimages/0.png" : imgUri}
                     title="Project"
                 />
                 <CardContent>

@@ -2,7 +2,7 @@
 import React, { useMemo, useLayoutEffect, useEffect } from "react";
 import objectPath from "object-path";
 import { useLocation } from "react-router-dom";
-import { QuickActions } from "./components/QuickActions";
+// import { QuickActions } from "./components/QuickActions";
 import { BreadCrumbs } from "./components/BreadCrumbs";
 import {
   getBreadcrumbsAndTitle,
@@ -78,7 +78,7 @@ export function SubHeader() {
         </div>
 
         {/* Toolbar */}
-        <div className="d-flex align-items-center">
+        {/* <div className="d-flex align-items-center">
           <button
             type="button"
             className="btn btn-transparent-white font-weight-bold  py-3 px-6 mr-4"
@@ -86,7 +86,7 @@ export function SubHeader() {
             Reports
           </button>
           <QuickActions />
-        </div>
+        </div> */}
       </div>
     </div>
   );

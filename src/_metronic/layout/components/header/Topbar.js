@@ -43,7 +43,7 @@ export function Topbar() {
 
   return (
     <div className="topbar">
-      {layoutProps.viewSearchDisplay && <SearchDropdown />}
+      {/* {layoutProps.viewSearchDisplay && <SearchDropdown />}
 
       {layoutProps.viewNotificationsDisplay && <UserNotificationsDropdown />}
 
@@ -78,7 +78,7 @@ export function Topbar() {
         </OverlayTrigger>
       )}
 
-      {layoutProps.viewLanguagesDisplay && <LanguageSelectorDropdown />}
+      {layoutProps.viewLanguagesDisplay && <LanguageSelectorDropdown />} */}
 
       {layoutProps.viewUserDisplay && <QuickUserToggler />}
     </div>
