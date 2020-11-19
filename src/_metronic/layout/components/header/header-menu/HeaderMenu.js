@@ -1,16 +1,33 @@
-/* eslint-disable no-script-url,jsx-a11y/anchor-is-valid */
-import React from "react";
-import { useLocation } from "react-router";
+import React, { useState, useEffect } from "react";
+import { useLocation, useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
 import { checkIsActive } from "../../../../_helpers";
 import { useSelector } from "react-redux";
+import { userSec } from "../../../../../services/securityClearanceService";
 
 export function HeaderMenu({ layoutProps }) {
     const location = useLocation();
+    const history = useHistory();
+    const [ isSuperAdmin, setSuperAdmin ] = useState(false);
     const getMenuItemActive = (url) => {
         return checkIsActive(location, url) ? "menu-item-active" : "";
     }
     const user = useSelector((state) => state.auth.user);
+
+    useEffect(() => {
+        userSec(user)
+        .then((result) => {
+            if ((result.role_id === 1 || result.role_id === 2) && result.com_id === 1) {
+                setSuperAdmin(true);
+            } else {
+                setSuperAdmin(false);
+            }
+        })
+        .catch(() => {
+            alert("Session expired.")
+            history.push("/logout");
+        })
+    })
 
     return <div
         id="kt_header_menu"
@@ -40,7 +57,7 @@ export function HeaderMenu({ layoutProps }) {
 
             {/*begin::1 Level*/}
             {
-                user.role_id === 2 || user.role_id === 1 ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/project-manager')}`}>
+                isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/project-manager')}`}>
                     <NavLink className="menu-link" to="/project-manager">
                         <span className="menu-text">Project Manager</span>
                         {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}

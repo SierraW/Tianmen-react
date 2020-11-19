@@ -3,7 +3,6 @@ import { Redirect, Switch, Route } from "react-router-dom";
 import { LayoutSplashScreen, ContentRoute } from "../_metronic/layout";
 import { BuilderPage } from "./pages/BuilderPage";
 import { MyProjectsPage } from "./modules/ProjectOverview/pages/MyProjectsPage";
-import { DashboardPage } from "./pages/DashboardPage";
 import { CustomerSupportPage } from "./modules/ProjectGeniusBar/pages/CustomerSupportPage";
 import { ProjectCreatorPage } from "./modules/ProjectCreator/pages/ProjectCreatorPage";
 import { ProjectManagerPage } from "./modules/ProjectManager/pages/ProjectManagerPage";

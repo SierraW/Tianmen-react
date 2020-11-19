@@ -75,7 +75,10 @@ function Login(props) {
           .then(({ data }) => {
             disableLoading();
             if (data.success === "failed") {
-              throw new Error(data.message);
+              disableLoading();
+              setSubmitting(false);
+              setStatus(data.message);
+              return;
             }
             props.login(data.data.user_session);
           })
@@ -83,10 +86,13 @@ function Login(props) {
             disableLoading();
             setSubmitting(false);
             setStatus(
-              intl.formatMessage({
-                id: "AUTH.VALIDATION.INVALID_LOGIN",
-              })
+              "Network Error."
             );
+            // setStatus(
+            //   intl.formatMessage({
+            //     id: "AUTH.VALIDATION.INVALID_LOGIN",
+            //   })
+            // );
           });
       }, 1000);
     },
