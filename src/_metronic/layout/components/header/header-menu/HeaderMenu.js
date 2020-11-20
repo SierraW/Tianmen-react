@@ -54,6 +54,23 @@ export function HeaderMenu({ layoutProps }) {
             </li>
             {/*end::1 Level*/}
 
+            {/*begin::1 Level*/}
+            <li className={`menu-item menu-item-rel ${getMenuItemActive('/add-on')}`}>
+                <NavLink className="menu-link" to="/add-on">
+                    <span className="menu-text">Add-Ons</span>
+                    {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                </NavLink>
+            </li>
+            {/*end::1 Level*/}
+
+            {/*begin::1 Level*/}
+            <li className={`menu-item menu-item-rel ${getMenuItemActive('/manage')}`}>
+                <NavLink className="menu-link" to="/add-on/manage">
+                    <span className="menu-text">Add-On Manage</span>
+                    {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                </NavLink>
+            </li>
+            {/*end::1 Level*/}
 
             {/*begin::1 Level*/}
             {

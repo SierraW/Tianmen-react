@@ -83,7 +83,7 @@ export default function ProjectAddOnManageTable({ className }) {
                                     className="h-50 align-self-center"
                                 ></PersonAddIcon>
                             </span>
-            Add New Member
+            Add add-on
           </button>
                     </div>
                 </div>

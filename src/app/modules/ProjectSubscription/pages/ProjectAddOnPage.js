@@ -35,7 +35,7 @@ export const ProjectAddOnPage = () => {
         return <>
             <div className="row">
                 {
-                    psCards.map((card, index) => (<ProjectSubscriptionCard key={index} className="col-lg-4 my-4" title={card.title} subtitle={card.subtitle} desList={card.desList} pid={card.pid} price={`CAD$${card.price}/Month`} />))
+                    psCards.map((card, index) => (<ProjectSubscriptionCard key={index} className="col-lg-4 my-4" title={card.title} subtitle="Add-On" desList={card.desList} pid={card.pid} price={`CAD$${card.price}/Month`} />))
                 }
             </div>
         </>;

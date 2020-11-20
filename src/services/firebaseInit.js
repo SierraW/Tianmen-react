@@ -18,6 +18,14 @@ function em_mashaji(roomId) {
   return em_chat.doc(roomId).collection("em_messages");
 }
 
+function em_aida(roomId) {
+  return em_chat.doc(roomId).collection("em_addons");
+}
+
+function em_payment(roomId) {
+  return em_chat.doc(roomId).collection("em_payment");
+}
+
 function timestamp(date = new Date()) {
   return firebase.firestore.Timestamp.fromDate(date);
 }
@@ -27,6 +35,8 @@ export {
   em_addOn,
   em_project,
   em_chat,
+  em_aida,
+  em_payment,
   em_room,
   em_mashaji,
   timestamp

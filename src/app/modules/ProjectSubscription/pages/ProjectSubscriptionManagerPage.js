@@ -6,8 +6,12 @@ import ProjectSubscriptionCard from "../components/ProjectSubscriptionCard";
 import { delay } from "../../../../services/delayLoading";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { em_room } from "../../../../services/firebaseInit"
-import ProjectSubscriptionManagementPaymentWidget from "../components/PSMPaymentWidget";
+import { em_room, timestamp } from "../../../../services/firebaseInit"
+import ProjectSubscriptionManagementChart from "../components/PSMChart";
+import ProjectSubscriptionManagementAddOnTable from "../components/PSMAddOnTable";
+import ProjectSubscriptionManagementRecordForm from "../components/PSMRecordForm";
+import ProjectSubscriptionManagementPaymentRecordTable from "../components/PSMPaymentRecordTable";
+import { formatDate } from "../../../../services/datePrintingService";
 
 const pscards = [
     {
@@ -63,7 +67,10 @@ const pscards = [
 export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     const suhbeader = useSubheader();
     suhbeader.setTitle("Manage Subscription and Payment");
-    const [paymentType, setPaymentType] = useState(0);
+    const [estAmount, setEstAmount] = useState(0);
+    const [status, setStatus] = useState(0);
+    const [startDate, setStartDate] = useState(formatDate(Date.now()));
+    const [endDate, setEndDate] = useState(formatDate(Date.now()));
     const [loading, setLoading] = useState(true);
     const [psCards, setPSCard] = useState(pscards);
     const [cardHolder, setCardHolder] = useState("");
@@ -88,7 +95,13 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
                         }
                         if (doc.data().project) {
                             const project = doc.data().project;
-                            setPaymentType(project.paymentType);
+                            if (project.start) {
+                                setStartDate(formatDate(project.start.toDate()));
+                            }
+                            if (project.end) {
+                                setEndDate(formatDate(project.end.toDate()));
+                            }
+                            setStatus(project.status);
                             setCardHolder(project.cardHolder);
                             setCardNumber(project.cardNumber);
                             setCardExp(project.cardExp);
@@ -118,7 +131,9 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     function handleSubmit(e) {
         e.preventDefault();
         const project = {
-            paymentType,
+            start: timestamp(new Date(startDate)),
+            end: timestamp(new Date(endDate)),
+            status,
             cardHolder,
             cardNumber,
             cardExp,
@@ -131,7 +146,7 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
         }
         if (power) {
             em_room(match.params.id).set({ project }, { merge: true })
-            .then(() => alert("success"))
+                .then(() => alert("success"))
         } else {
             alert("Denied");
         }
@@ -144,26 +159,43 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
             <div className="my-6"><h1 className="text-light">For project: {match.params.id}</h1></div>
             <div className="card">
                 <div className="card-body">
-                    <ProjectSubscriptionManagementPaymentWidget />
+                    <ProjectSubscriptionManagementChart pid={match.params.id} />
+                    <ProjectSubscriptionManagementRecordForm pid={match.params.id} estAmount={estAmount} setEstAmount={setEstAmount} />
+                    <ProjectSubscriptionManagementPaymentRecordTable pid={match.params.id} />
+                </div>
+            </div>
+            <div className="card mt-6">
+                <div className="card-body">
+                    <ProjectSubscriptionManagementAddOnTable pid={match.params.id} setEstAmount={setEstAmount} />
                 </div>
             </div>
             <div className="card mt-6">
                 <Form className="card-body" onSubmit={(e) => handleSubmit(e)}>
-                    <Form.Group controlId="formPrice">
+                    <Form.Group controlId="formStatus">
                         <Form.Label>
-                            Payment Type
+                            状态
                         </Form.Label>
                         <Form.Control
                             as="select"
                             custom
-                            value={paymentType}
-                            onChange={(e) => setPaymentType(e.target.value)}
+                            value={status}
+                            onChange={(e) => setStatus(e.target.value)}
                         >
-                            <option value="0">Choose...</option>
-                            <option value="1">$50 Monthly</option>
-                            <option value="2">$150 Monthly</option>
-                            <option value="3">$5000 One-time</option>
+                            <option value="0">...</option>
+                            <option value="1">选模版</option>
+                            <option value="2">制作中</option>
+                            <option value="3">已上线</option>
                         </Form.Control>
+                    </Form.Group>
+
+                    <Form.Group controlId="formOP">
+                        <Form.Label>Start Date</Form.Label>
+                        <Form.Control value={startDate} onChange={(e) => setStartDate(e.target.value)} type="date" />
+                    </Form.Group>
+
+                    <Form.Group controlId="formEND">
+                        <Form.Label>End Date</Form.Label>
+                        <Form.Control value={endDate} onChange={(e) => setEndDate(e.target.value)} type="date" />
                     </Form.Group>
 
                     <Form.Group controlId="formCH">
@@ -202,7 +234,7 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
                         <Form.Label>Address</Form.Label>
                         <Form.Control value={address} onChange={(e) => setAddress(e.target.value)} type="text" placeholder="25 Valleywood Drive" />
                     </Form.Group>
-                    <Form.Group controlId="formADDR">
+                    <Form.Group controlId="formPost">
                         <Form.Label>Postal Code</Form.Label>
                         <Form.Control value={postal} onChange={(e) => setPostal(e.target.value)} type="text" placeholder="A1B 2C3" />
                     </Form.Group>

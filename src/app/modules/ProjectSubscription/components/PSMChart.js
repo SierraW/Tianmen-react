@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ApexCharts from 'react-apexcharts';
+import PropTypes from "prop-types";
+import { em_payment, em_room } from "../../../../services/firebaseInit";
+import { formatDate } from "../../../../services/datePrintingService";
 
-export default function ProjectSubscriptionManagementChart({name}) {
+export default function ProjectSubscriptionManagementChart({ pid }) {
 
     const basicOptions = {
         chart: {
@@ -37,30 +40,58 @@ export default function ProjectSubscriptionManagementChart({name}) {
         },
         tooltip: {
             y: {
-              formatter: function(val) {
-                return "$" + val;
-              }
+                formatter: function (val) {
+                    return "$" + val;
+                }
             }
         },
     }
-    const [labels, setLabel] = useState({
-        labels: ["2020", "2021", "2022"]
-    })
-    const [series, setSeries] = useState([{
-        name,
-        data: [5000, 6000, 7000]
-    }])
+    const [name, setName] = useState("");
+    const [labels, setLabel] = useState([])
+    const [series, setSeries] = useState([])
+    const [nextBillDate, setNextBillDate] = useState("无预测")
 
+    useEffect(() => {
+        em_room(pid).get().then((doc) => {
+            setName(doc.data().name);
+        })
+        var unsubscribe = em_payment(pid).onSnapshot((querySnapshot) => {
+            var resultArrLabel = [], resultArrSeries = []
+            querySnapshot.forEach((doc) => {
+                resultArrLabel.push(doc.data().date);
+                resultArrSeries.push(doc.data().amount);
+            })
+            if (resultArrSeries.length > 0) {
+                setLabel(resultArrLabel);
+                setSeries(resultArrSeries);
+            }
+        })
+        return function cleanup() {
+            unsubscribe();
+        };
+    }, [])
+
+    useEffect(() => {
+        setNextBillDate(getNextBillDate());
+    }, [labels])
+
+    function getNextBillDate() {
+        if (labels.length === 0) {
+            return "无预测";
+        } else {
+            var date = new Date(labels[0]);
+            date.setMonth(date.getMonth() + 1);
+            date.setDate(date.getDate() + 1);
+            return formatDate(date);
+        }
+    }
 
     return <>
-        <ApexCharts options={{...basicOptions, ...labels}} series={series} type="area" height={350} />
+        <ApexCharts options={{ ...basicOptions, labels }} series={[{ name, data: series }]} type="area" height={350} />
+        <p className="mb-6">预计下次扣费日期: {nextBillDate}</p>
     </>
 }
 
-// series: [{
-//     name: "STOCK ABC",
-//     data: series.monthDataSeries1.prices
-//   }],
-//   options: {
-//     
-//   },
+ProjectSubscriptionManagementChart.propTypes = {
+    pid: PropTypes.string.isRequired
+}

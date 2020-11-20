@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import Button from 'react-bootstrap/Button';
 import PropTypes from "prop-types";
-import { em_addOn } from "../../../../services/firebaseInit";
+import { em_addOn, timestamp } from "../../../../services/firebaseInit";
 
 export default function ProjectAddOnManageForm(props) {
 
@@ -18,7 +18,8 @@ export default function ProjectAddOnManageForm(props) {
                 name,
                 des,
                 price: Number.parseFloat(price),
-                available: true
+                available: true,
+                time: timestamp()
             })
             .then(() => alert("success"))
         } else {
@@ -52,7 +53,7 @@ export default function ProjectAddOnManageForm(props) {
 
             <Form.Group controlId="formAD">
                 <Form.Label>Description</Form.Label>
-                <Form.Control required value={des} onChange={(e) => setDes(e.target.value)} as="textarea" row="7" />
+                <Form.Control value={des} onChange={(e) => setDes(e.target.value)} as="textarea" row="7" />
                 <Form.Text className="text-muted">
                     Separated by line.
                 </Form.Text>

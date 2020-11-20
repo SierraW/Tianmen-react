@@ -36,7 +36,7 @@ export default function BasePage() {
         <ContentRoute path="/project-manager" component={ProjectManagerPage} />
         <ContentRoute path="/subscription" component={ProjectSubscriptionPage} />
         <ContentRoute path="/version" component={VersionPage} />
-        <Route path="/add-on-manage" component={ProjectAddOnManagePage} />
+        <Route path="/add-on/manage" component={ProjectAddOnManagePage} />
         <Route path="/add-on" component={ProjectAddOnPage} />
         <Route path="/news-notifications-manager" component={MyProjectsManagePage} />
         <Route path="/support" component={CustomerSupportPage} />
