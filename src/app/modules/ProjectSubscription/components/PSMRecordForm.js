@@ -7,16 +7,15 @@ import { formatDate } from "../../../../services/datePrintingService";
 import { em_payment, timestamp } from "../../../../services/firebaseInit";
 import PropTypes from "prop-types";
 
-export default function ProjectSubscriptionManagementRecordForm({ pid, estAmount, setEstAmount }) {
+export default function ProjectSubscriptionManagementRecordForm({ pid, estAmount, setEstAmount, billGates, setBillGates }) {
 
-    const [billDate, setBillDate] = useState(formatDate(Date.now()));
     const [billType, setBillType] = useState(0);
 
     function handleSubmit(event) {
         event.preventDefault();
         em_payment(pid).add({
             amount: estAmount,
-            date: billDate,
+            date: billGates,
             type: billType,
             time: timestamp()
         })
@@ -27,7 +26,7 @@ export default function ProjectSubscriptionManagementRecordForm({ pid, estAmount
 
             <Form.Group controlId="formRFDate">
                 <Form.Label>日期</Form.Label>
-                <Form.Control value={billDate} onChange={(e) => setBillDate(e.target.value)} type="date" />
+                <Form.Control value={billGates} onChange={(e) => setBillGates(e.target.value)} type="date" />
             </Form.Group>
 
             <Form.Group controlId="formRFAmount">
@@ -77,5 +76,7 @@ export default function ProjectSubscriptionManagementRecordForm({ pid, estAmount
 ProjectSubscriptionManagementRecordForm.propTypes = {
     pid: PropTypes.string.isRequired,
     estAmount: PropTypes.number.isRequired,
-    setEstAmount: PropTypes.func.isRequired
+    setEstAmount: PropTypes.func.isRequired,
+    billGates: PropTypes.string.isRequired,
+    setBillGates: PropTypes.func.isRequired
 }

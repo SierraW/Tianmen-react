@@ -13,66 +13,16 @@ import ProjectSubscriptionManagementRecordForm from "../components/PSMRecordForm
 import ProjectSubscriptionManagementPaymentRecordTable from "../components/PSMPaymentRecordTable";
 import { formatDate } from "../../../../services/datePrintingService";
 
-const pscards = [
-    {
-        title: "Monthly Plan.",
-        subtitle: "For personal and small business",
-        desList: [
-            "Personal / Small business website design.",
-            "Free website hosting.",
-            "Domain name email services.",
-            "Server maintenance."
-        ],
-        pid: "JKLISOFONIO",
-        price: "CAD $50 / Month"
-    },
-    {
-        title: "Custom Plan.",
-        subtitle: "For detailed design",
-        desList: [
-            "Custom design.",
-            "Free website hosting.",
-            "Domain name email services.",
-            "Server maintenance."
-        ],
-        pid: "JKLISOFONIO",
-        price: "CAD $5000"
-    },
-    {
-        title: "SEO Plan.",
-        subtitle: "For your business",
-        desList: [
-            "Search engine optimization.",
-            "Monthly report.",
-            "Social media control.",
-            "Pro service."
-        ],
-        pid: "JKLISOFONIO",
-        price: "CAD $150 / Month"
-    },
-    {
-        title: "Contact Us...",
-        subtitle: "For more infomation",
-        desList: [
-            "Your one-stop solution provider.",
-            "Web design and hosting.",
-            "App design and deploy.",
-            "Pro SEO service."
-        ],
-        pid: "CONTACT-US",
-        price: "Plan starts at $0"
-    },
-]
-
 export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     const suhbeader = useSubheader();
     suhbeader.setTitle("Manage Subscription and Payment");
+    const now = formatDate(Date.now());
+    const [billGates, setBillGates] = useState(now);
     const [estAmount, setEstAmount] = useState(0);
     const [status, setStatus] = useState(0);
-    const [startDate, setStartDate] = useState(formatDate(Date.now()));
-    const [endDate, setEndDate] = useState(formatDate(Date.now()));
+    const [startDate, setStartDate] = useState(now);
+    const [endDate, setEndDate] = useState(now);
     const [loading, setLoading] = useState(true);
-    const [psCards, setPSCard] = useState(pscards);
     const [cardHolder, setCardHolder] = useState("");
     const [cardNumber, setCardNumber] = useState("");
     const [cardExp, setCardExp] = useState("");
@@ -159,8 +109,8 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
             <div className="my-6"><h1 className="text-light">For project: {match.params.id}</h1></div>
             <div className="card">
                 <div className="card-body">
-                    <ProjectSubscriptionManagementChart pid={match.params.id} />
-                    <ProjectSubscriptionManagementRecordForm pid={match.params.id} estAmount={estAmount} setEstAmount={setEstAmount} />
+                    <ProjectSubscriptionManagementChart pid={match.params.id} setBillGates={setBillGates} />
+                    <ProjectSubscriptionManagementRecordForm pid={match.params.id} estAmount={estAmount} setEstAmount={setEstAmount} billGates={billGates} setBillGates={setBillGates} />
                     <ProjectSubscriptionManagementPaymentRecordTable pid={match.params.id} />
                 </div>
             </div>

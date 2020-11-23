@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import { em_payment, em_room } from "../../../../services/firebaseInit";
 import { formatDate } from "../../../../services/datePrintingService";
 
-export default function ProjectSubscriptionManagementChart({ pid }) {
+export default function ProjectSubscriptionManagementChart({ pid, setBillGates }) {
 
     const basicOptions = {
         chart: {
@@ -72,12 +72,15 @@ export default function ProjectSubscriptionManagementChart({ pid }) {
     }, [])
 
     useEffect(() => {
-        setNextBillDate(getNextBillDate());
+        const nextBillGates = getNextBillDate();
+        if (nextBillGates) {
+            setBillGates(nextBillGates);
+        }
     }, [labels])
 
     function getNextBillDate() {
         if (labels.length === 0) {
-            return "无预测";
+            return null;
         } else {
             var date = new Date(labels[0]);
             date.setMonth(date.getMonth() + 1);
@@ -88,10 +91,10 @@ export default function ProjectSubscriptionManagementChart({ pid }) {
 
     return <>
         <ApexCharts options={{ ...basicOptions, labels }} series={[{ name, data: series }]} type="area" height={350} />
-        <p className="mb-6">预计下次扣费日期: {nextBillDate}</p>
     </>
 }
 
 ProjectSubscriptionManagementChart.propTypes = {
-    pid: PropTypes.string.isRequired
+    pid: PropTypes.string.isRequired,
+    setBillGates: PropTypes.func.isRequired
 }
