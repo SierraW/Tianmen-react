@@ -54,22 +54,40 @@ export function HeaderMenu({ layoutProps }) {
             </li>
             {/*end::1 Level*/}
 
-            {/*begin::1 Level*/}
-            <li className={`menu-item menu-item-rel ${getMenuItemActive('/add-on')}`}>
+            {
+                isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/news-notifications-manager')}`}>
+                <NavLink className="menu-link" to="/news-notifications-manager">
+                    <span className="menu-text">News/Notis Manage</span>
+                    {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                </NavLink>
+            </li>) : ''
+            }
+
+            {
+                isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/subscription-manage')}`}>
+                <NavLink className="menu-link" to="/subscription-manage">
+                    <span className="menu-text">Plan Manage</span>
+                    {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                </NavLink>
+            </li>) : ''
+            }
+
+            {/* <li className={`menu-item menu-item-rel ${getMenuItemActive('/add-on')}`}>
                 <NavLink className="menu-link" to="/add-on">
                     <span className="menu-text">Add-Ons</span>
                     {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
                 </NavLink>
-            </li>
-            {/*end::1 Level*/}
+            </li> */}
 
             {/*begin::1 Level*/}
-            <li className={`menu-item menu-item-rel ${getMenuItemActive('/manage')}`}>
+            {
+                isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/add-on/manage')}`}>
                 <NavLink className="menu-link" to="/add-on/manage">
                     <span className="menu-text">Add-On Manage</span>
                     {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
                 </NavLink>
-            </li>
+            </li>) : ''
+            }
             {/*end::1 Level*/}
 
             {/*begin::1 Level*/}

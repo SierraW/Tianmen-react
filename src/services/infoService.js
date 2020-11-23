@@ -7,7 +7,45 @@ export function getNews() {
             if (data.success === "success") {
                 resolve(data.data);
             } else {
-                throw new Error(data.message);
+                reject(data.message);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+export function addNews(session, newsObj) {
+    return new Promise((resolve, reject) => {
+        axios.post("http://tianmengroup.com/server/socket/home/addNews.php", {
+            session,
+            ...newsObj
+        })
+        .then(({data}) => {
+            if (data.success === "success") {
+                resolve(data.data)
+            } else {
+                reject(data.message);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+export function deleteNews(session, id) {
+    return new Promise((resolve, reject) => {
+        axios.post("http://tianmengroup.com/server/socket/home/deleteNews.php", {
+            session,
+            id
+        })
+        .then(({data}) => {
+            if (data.success === "success") {
+                resolve(data.data)
+            } else {
+                throw new Error(data.message)
             }
         })
         .catch(err => {
@@ -23,7 +61,45 @@ export function getNaughtys() {
             if (data.success === "success") {
                 resolve(data.data);
             } else {
-                throw new Error(data.message);
+                reject(data.message);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+export function addNaughtys(session, naughtyObj) {
+    return new Promise((resolve, reject) => {
+        axios.post("http://tianmengroup.com/server/socket/home/addNotifications.php", {
+            session,
+            ...naughtyObj
+        })
+        .then(({data}) => {
+            if (data.success === "success") {
+                resolve(data.data)
+            } else {
+                reject(data.message);
+            }
+        })
+        .catch(err => {
+            reject(err);
+        })
+    })
+}
+
+export function deleteNaughtys(session, id) {
+    return new Promise((resolve, reject) => {
+        axios.post("http://tianmengroup.com/server/socket/home/deleteNotifications.php", {
+            session,
+            id
+        })
+        .then(({data}) => {
+            if (data.success === "success") {
+                resolve(data.data)
+            } else {
+                reject(data.message);
             }
         })
         .catch(err => {

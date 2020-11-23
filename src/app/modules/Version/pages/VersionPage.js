@@ -13,7 +13,7 @@ export function VersionPage() {
     return <>
         <div className="row">
             {versionData.map((data, index) => (
-                <VersionCard key={index} className="col-lg-4" title={data.version} fix={data.fix} update={data.update} add={data.add} />
+                <VersionCard key={index} className="col-lg-4 my-6" title={data.version} fix={data.fix} update={data.update} add={data.add} />
             ))}
         </div>
     </>;

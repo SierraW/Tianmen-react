@@ -28,12 +28,11 @@ export default function ProjectOverviewWidgetNotificationsList({ className }) {
                             </span>
 
                             <div className="d-flex flex-column flex-grow-1 mr-2">
-                                <a
-                                    href="#"
+                                <span
                                     className="font-weight-bold text-dark-75 text-hover-primary font-size-lg mb-1"
                                 >
                                     {naughty.title}
-                                </a>
+                                </span>
                                 <span className="text-muted font-weight-bold">{naughty.date}</span>
                             </div>
 

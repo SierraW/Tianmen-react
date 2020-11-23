@@ -5,7 +5,6 @@ import SearchIcon from '@material-ui/icons/Search';
 export default function ProjectManagerTableSearchBar() {
     const [loading, setLoading] = useState(false);
     const [searchValue, setSearchValue] = useState("");
-    let timeoutId;
 
     const handleSearchChange = (event) => {
         setSearchValue(event.target.value);
@@ -16,7 +15,7 @@ export default function ProjectManagerTableSearchBar() {
             setLoading(true);
 
             // simulate getting search result
-            timeoutId = setTimeout(() => {
+            setTimeout(() => {
                 setLoading(false);
             }, 500);
         }

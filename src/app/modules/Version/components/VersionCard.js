@@ -2,8 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 
 export default function VersionCard({ title, fix, update, add, className }) {
-    return <>
-        <div className={`card ${className}`}>
+    return <div className={className}>
+        <div className={`card`}>
             <div className="card-body">
                 <h4>Version {title}</h4>
                 {fix.length !== 0 ? (<>
@@ -39,7 +39,7 @@ export default function VersionCard({ title, fix, update, add, className }) {
 
             </div>
         </div>
-    </>
+        </div>;
 }
 
 VersionCard.propTypes = {

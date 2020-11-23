@@ -16,3 +16,18 @@ export const paymentType = [
         name: "EMT"
     }
 ]
+
+export const projectStatus = [
+    {
+        name: "..."
+    },
+    {
+        name: "选模版"
+    },
+    {
+        name: "制作中"
+    },
+    {
+        name: "已上线"
+    }
+]

@@ -12,6 +12,7 @@ import { MyProjectsManagePage } from "./modules/ProjectOverview/pages/MyProjects
 import { VersionPage } from "./modules/Version/pages/VersionPage";
 import { ProjectAddOnPage } from "./modules/ProjectSubscription/pages/ProjectAddOnPage";
 import { ProjectAddOnManagePage } from "./modules/ProjectSubscription/pages/ProjectAddOnManagePage";
+import { ProjectSubscriptionManagePage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionManagePage";
 
 const UserProfilepage = lazy(() =>
   import("./modules/UserProfile/UserProfilePage")
@@ -37,6 +38,7 @@ export default function BasePage() {
         <ContentRoute path="/subscription" component={ProjectSubscriptionPage} />
         <ContentRoute path="/version" component={VersionPage} />
         <Route path="/add-on/manage" component={ProjectAddOnManagePage} />
+        <Route path="/subscription-manage" component={ProjectSubscriptionManagePage} />
         <Route path="/add-on" component={ProjectAddOnPage} />
         <Route path="/news-notifications-manager" component={MyProjectsManagePage} />
         <Route path="/support" component={CustomerSupportPage} />

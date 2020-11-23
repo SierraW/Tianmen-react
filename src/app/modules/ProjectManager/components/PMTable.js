@@ -2,24 +2,35 @@ import React, { useEffect, useState } from "react";
 import ProjectManagerTableItem from "./PMTableItem";
 import ProjectManagerTableSearchBar from "./PMTableSearchBar";
 import { NavLink } from "react-router-dom";
-import { em_chat } from "../../../../services/firebaseInit"
+import { em_chat } from "../../../../services/firebaseInit";
+import { projectStatus } from '../../ProjectSubscription/data/PaymentTypeData';
 
 export default function ProjectManagerTable({ className }) {
 
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    em_chat.orderBy("time", "desc").get().then((querySnapshot) => {
-      var result = [];
-      querySnapshot.forEach((doc) => {
-        result.push({
-          id: doc.id,
-          name: doc.data().name,
-          type: doc.data().type
+
+    (async () => {
+      var rawResultItems = []
+      await em_chat.orderBy("time", "desc").get().then((querySnapshot) => {
+        querySnapshot.forEach(async (doc) => {
+          const project = doc.data().project;
+          rawResultItems.push({
+            pid: doc.id,
+            name: doc.data().name,
+            type: doc.data().type,
+            status: project ? project.status : 0,
+            start: project ? project.start : "Not Set",
+            due: project ? project.due : "Not Set",
+            end: project ? project.end : "Not Set"
+          })
         })
       })
-      setItems(result);
-    })
+
+      setItems(rawResultItems);
+    })();
+
   }, [])
 
   return (
@@ -45,15 +56,16 @@ export default function ProjectManagerTable({ className }) {
                   <th style={{ minWidth: "100px" }}>Since / Due</th>
                   <th style={{ minWidth: "100px" }}>Delivered</th>
                   <th style={{ minWidth: "100px" }}>Last Payment</th>
-                  <th style={{ minWidth: "100px" }}>Next Payment</th>
                   <th style={{ minWidth: "100px" }}>Amount</th>
+                  <th style={{ minWidth: "100px" }}>Next Payment</th>
                   <th style={{ minWidth: "80px" }} />
                 </tr>
               </thead>
               <tbody>
-                {items.map(item => (
-                  <ProjectManagerTableItem key={item.id} roomId={item.id} name={item.name} type={item.type}></ProjectManagerTableItem>
-                ))}
+                {
+                  items.map(item => (
+                    <ProjectManagerTableItem key={item.pid} roomId={item.pid} name={item.name} type={item.type} status={projectStatus[item.status].name} start={item.start} end={item.end} due={item.due} ></ProjectManagerTableItem>
+                  ))}
               </tbody>
             </table>
           </div>

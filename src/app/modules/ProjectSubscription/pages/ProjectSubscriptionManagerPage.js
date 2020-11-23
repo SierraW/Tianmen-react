@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useSubheader } from "../../../../_metronic/layout";
 import { LayoutSplashScreen } from "../../../../_metronic/layout";
-import { useSelector } from "react-redux";
-import ProjectSubscriptionCard from "../components/ProjectSubscriptionCard";
 import { delay } from "../../../../services/delayLoading";
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import { em_room, timestamp } from "../../../../services/firebaseInit"
+import { em_room } from "../../../../services/firebaseInit"
 import ProjectSubscriptionManagementChart from "../components/PSMChart";
 import ProjectSubscriptionManagementAddOnTable from "../components/PSMAddOnTable";
 import ProjectSubscriptionManagementRecordForm from "../components/PSMRecordForm";
 import ProjectSubscriptionManagementPaymentRecordTable from "../components/PSMPaymentRecordTable";
 import { formatDate } from "../../../../services/datePrintingService";
+import { projectStatus } from '../data/PaymentTypeData';
 
 export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     const suhbeader = useSubheader();
@@ -21,6 +20,7 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     const [estAmount, setEstAmount] = useState(0);
     const [status, setStatus] = useState(0);
     const [startDate, setStartDate] = useState(now);
+    const [dueDate, setDueDate] = useState(now);
     const [endDate, setEndDate] = useState(now);
     const [loading, setLoading] = useState(true);
     const [cardHolder, setCardHolder] = useState("");
@@ -33,7 +33,6 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     const [postal, setPostal] = useState("");
     const [country, setCountry] = useState("");
     const [power, setPower] = useState(false);
-    const uid = useSelector((state) => state.auth.user.id);
 
     useEffect(() => {
         async function checkDoc() {
@@ -46,10 +45,13 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
                         if (doc.data().project) {
                             const project = doc.data().project;
                             if (project.start) {
-                                setStartDate(formatDate(project.start.toDate()));
+                                setStartDate(project.start);
                             }
                             if (project.end) {
-                                setEndDate(formatDate(project.end.toDate()));
+                                setEndDate(project.end);
+                            }
+                            if (project.due) {
+                                setDueDate(project.due)
                             }
                             setStatus(project.status);
                             setCardHolder(project.cardHolder);
@@ -81,8 +83,9 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
     function handleSubmit(e) {
         e.preventDefault();
         const project = {
-            start: timestamp(new Date(startDate)),
-            end: timestamp(new Date(endDate)),
+            start: startDate,
+            due: dueDate,
+            end: endDate,
             status,
             cardHolder,
             cardNumber,
@@ -131,10 +134,11 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
                         >
-                            <option value="0">...</option>
-                            <option value="1">选模版</option>
-                            <option value="2">制作中</option>
-                            <option value="3">已上线</option>
+                            {
+                                projectStatus.map((ps, index) => (
+                                    <option key={index} value={index}>{ps.name}</option>
+                                ))
+                            }
                         </Form.Control>
                     </Form.Group>
 
@@ -143,8 +147,13 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
                         <Form.Control value={startDate} onChange={(e) => setStartDate(e.target.value)} type="date" />
                     </Form.Group>
 
+                    <Form.Group controlId="formDUD">
+                        <Form.Label>Scheduled Due Date</Form.Label>
+                        <Form.Control value={dueDate} onChange={(e) => setDueDate(e.target.value)} type="date" />
+                    </Form.Group>
+
                     <Form.Group controlId="formEND">
-                        <Form.Label>End Date</Form.Label>
+                        <Form.Label>Deliver Date</Form.Label>
                         <Form.Control value={endDate} onChange={(e) => setEndDate(e.target.value)} type="date" />
                     </Form.Group>
 

@@ -1,5 +1,17 @@
 [
     {
+        "version": "0.3.0a (ALPHA)",
+        "fix": [],
+        "add": ["News-Notification manage section."],
+        "update": []
+    },
+    {
+        "version": "0.2.0a (ALPHA)",
+        "fix": [],
+        "add": ["Payment record section."],
+        "update": []
+    },
+    {
         "version": "0.1.0a (ALPHA)",
         "fix": [],
         "add": ["Minimum working version"],

@@ -49,7 +49,6 @@ export default function ProjectSubscriptionManagementChart({ pid, setBillGates }
     const [name, setName] = useState("");
     const [labels, setLabel] = useState([])
     const [series, setSeries] = useState([])
-    const [nextBillDate, setNextBillDate] = useState("无预测")
 
     useEffect(() => {
         em_room(pid).get().then((doc) => {

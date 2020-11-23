@@ -5,10 +5,11 @@ import { useSubheader } from "../../../../_metronic/layout";
 import { LayoutSplashScreen } from "../../../../_metronic/layout";
 import { delay } from "../../../../services/delayLoading";
 import { useSelector } from "react-redux";
+import ProjectOverviewHybridTable from "../components/POHybridTable";
 
 export function MyProjectsManagePage() {
   const suhbeader = useSubheader();
-  suhbeader.setTitle("News and Notifications Manager");
+  suhbeader.setTitle("News and Notifications Manage");
   const [loading, setLoading] = useState(true);
   const uid = useSelector((state) => state.auth.user.id);
 
@@ -29,11 +30,11 @@ export function MyProjectsManagePage() {
         </div>
 
         <div className="col-lg-6">
-
+            <ProjectOverviewHybridTable className="card-stretch gutter-b" type={0} />
         </div>
 
         <div className="col-lg-6">
-            
+            <ProjectOverviewHybridTable className="card-stretch gutter-b" type={1} />
         </div>
 
       </div>

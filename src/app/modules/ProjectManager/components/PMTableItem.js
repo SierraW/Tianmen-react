@@ -3,20 +3,41 @@ import PropTypes from 'prop-types';
 import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { em_room } from "../../../../services/firebaseInit";
+import { em_payment } from "../../../../services/firebaseInit";
 import * as cs from "../../../../redux/csRedux";
+import { formatDate } from "../../../../services/datePrintingService";
 
-export default function ProjectManagerTableItem({ roomId, name, type }) {
+export default function ProjectManagerTableItem({ roomId, name, type, status, start, end, due }) {
     const dispatch = useDispatch();
     const history = useHistory();
+    const [date, setDate] = useState("...");
+    const [amount, setAmount] = useState(0);
     // numOfNewMsgs, lastMsgBody, lastMsgName, attendersFs, attendersCus
     useEffect(() => {
-
+        em_payment(roomId).orderBy("date", "desc").limit(1).get().then((querySnapshot) => {
+            if (querySnapshot.size === 1) {
+                querySnapshot.forEach((doc) => {
+                    setDate(doc.data().date);
+                    setAmount(doc.data().amount);
+                })
+            }
+        })
     }, [])
 
     var enterProject = function () {
         dispatch(cs.actions.setRoom(roomId));
         history.push("/support");
+    }
+
+    function getNextBillDate() {
+        if (date === "...") {
+            return "...";
+        } else {
+            var ndate = new Date(date);
+            ndate.setMonth(ndate.getMonth() + 1);
+            ndate.setDate(ndate.getDate() + 1);
+            return formatDate(ndate);
+        }
     }
 
     return <>
@@ -38,38 +59,35 @@ export default function ProjectManagerTableItem({ roomId, name, type }) {
             </td>
             <td>
                 <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    制作中
+                    {status}
+                </span>
+            </td>
+            <td>
+                <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
+                    {start}
                 </span>
                 <span className="text-muted font-weight-bold">
-                    Nelson!
+                    {due}
                 </span>
             </td>
             <td>
                 <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    2020-01-01
-                </span>
-                <span className="text-muted font-weight-bold">
-                    2020-02-02
+                    {end}
                 </span>
             </td>
             <td>
                 <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    TBD
+                    {date}
                 </span>
             </td>
             <td>
                 <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    2020-10-10
+                    ${amount}
                 </span>
             </td>
             <td>
                 <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    2020-11-10
-                </span>
-            </td>
-            <td>
-                <span className="text-dark-75 font-weight-bolder d-block font-size-lg">
-                    $4000
+                    {getNextBillDate()}
                 </span>
             </td>
             <td className="pr-0 text-right">
@@ -84,4 +102,8 @@ ProjectManagerTableItem.propTypes = {
     roomId: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    start: PropTypes.string.isRequired,
+    due: PropTypes.string.isRequired,
+    end: PropTypes.string.isRequired,
 }
