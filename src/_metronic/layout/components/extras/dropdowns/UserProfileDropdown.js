@@ -51,14 +51,14 @@ export function UserProfileDropdown() {
             <>
               <div className="d-flex align-items-center p-8 rounded-top">
                 <div className="symbol symbol-md bg-light-primary mr-3 flex-shrink-0">
-                  <img src={toAbsoluteUrl("/media/users/300_21.jpg")} alt="" />
+                  <img src={user.head ? `http://tianmengroup.com/server/heads/${user.head}` : "http://tianmengroup.com/server/heads/blank.png"} alt="USER" />
                 </div>
                 <div className="text-dark m-0 flex-grow-1 mr-3 font-size-h5">
                 {user.display_name}
                 </div>
-                <span className="label label-light-success label-lg font-weight-bold label-inline">
+                {/* <span className="label label-light-success label-lg font-weight-bold label-inline">
                   3 messages
-                </span>
+                </span> */}
               </div>
               <div className="separator separator-solid"></div>
             </>
@@ -90,7 +90,7 @@ export function UserProfileDropdown() {
         </>
 
         <div className="navi navi-spacer-x-0 pt-5">
-          <Link to="/user-profile" className="navi-item px-8 cursor-pointer">
+          <Link aria-disabled to="/user-profile" className="navi-item px-8 cursor-pointer">
             <div className="navi-link">
               <div className="navi-icon mr-2">
                 <i className="flaticon2-calendar-3 text-success" />
@@ -102,14 +102,14 @@ export function UserProfileDropdown() {
                 <div className="text-muted">
                   Account settings and more
                   <span className="label label-light-danger label-inline font-weight-bold">
-                    update
+                    Under Development
                   </span>
                 </div>
               </div>
             </div>
           </Link>
 
-          <a className="navi-item px-8">
+          {/* <a className="navi-item px-8">
             <div className="navi-link">
               <div className="navi-icon mr-2">
                 <i className="flaticon2-mail text-warning"></i>
@@ -143,7 +143,7 @@ export function UserProfileDropdown() {
                 <div className="text-muted">latest tasks and projects</div>
               </div>
             </div>
-          </a>
+          </a> */}
           <div className="navi-separator mt-3"></div>
 
           <div className="navi-footer  px-8 py-5">
@@ -153,9 +153,9 @@ export function UserProfileDropdown() {
             >
               Sign Out
             </Link>
-            <a href="#" className="btn btn-clean font-weight-bold">
+            <Link to="/subscription" className="btn btn-clean font-weight-bold">
               Upgrade Plan
-            </a>
+            </Link>
           </div>
         </div>
       </Dropdown.Menu>

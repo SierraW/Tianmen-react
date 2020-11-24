@@ -4,6 +4,8 @@ import { useLocation } from "react-router";
 import { NavLink } from "react-router-dom";
 import SVG from "react-inlinesvg";
 import { toAbsoluteUrl, checkIsActive } from "../../../../_helpers";
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import PlaylistAddIcon from '@material-ui/icons/PlaylistAdd';
 
 export function AsideMenuList({ layoutProps }) {
   const location = useLocation();
@@ -24,7 +26,7 @@ export function AsideMenuList({ layoutProps }) {
         >
           <NavLink className="menu-link" to="/dashboard">
             <span className="svg-icon menu-icon">
-              <SVG src={toAbsoluteUrl("/media/svg/icons/Design/Layers.svg")} />
+              <DashboardIcon />
             </span>
             <span className="menu-text">Dashboard</span>
           </NavLink>
@@ -33,14 +35,14 @@ export function AsideMenuList({ layoutProps }) {
 
         {/*begin::1 Level*/}
         <li
-          className={`menu-item ${getMenuItemActive("/builder", false)}`}
+          className={`menu-item ${getMenuItemActive("/subscription", false)}`}
           aria-haspopup="true"
         >
-          <NavLink className="menu-link" to="/builder">
+          <NavLink className="menu-link" to="/subscription">
             <span className="svg-icon menu-icon">
-              <SVG src={toAbsoluteUrl("/media/svg/icons/Home/Library.svg")} />
+              <PlaylistAddIcon />
             </span>
-            <span className="menu-text">Layout Builder</span>
+            <span className="menu-text">Browse</span>
           </NavLink>
         </li>
         {/*end::1 Level*/}

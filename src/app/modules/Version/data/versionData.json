@@ -1,7 +1,7 @@
 [
     {
-        "version": "0.3.0a (ALPHA)",
-        "fix": [],
+        "version": "0.3.1a (ALPHA)",
+        "fix": ["Clear unused widgets."],
         "add": ["News-Notification manage section."],
         "update": []
     },
