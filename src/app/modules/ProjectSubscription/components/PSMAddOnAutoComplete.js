@@ -2,7 +2,7 @@ import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { em_addOn, em_aida, timestamp } from "../../../../services/firebaseInit";
+import { em_addOn, em_aida } from "../../../../services/firebaseInit";
 import Button from 'react-bootstrap/Button';
 import PropTypes from "prop-types";
 import { formatDate } from "../../../../services/datePrintingService";

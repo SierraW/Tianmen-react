@@ -68,11 +68,11 @@ export const CustomerSupportPage = () => {
     };
 
     function clientAttendee() {
-        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].company !== "Firestudio" : false) : [];
+        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].company !== "Finestudio" : false) : [];
     }
 
     function fsAttendee() {
-        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].company === "Firestudio" : false) : [];
+        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].company === "Finestudio" : false) : [];
     }
 
     function getHeadUri(user) {
@@ -96,7 +96,7 @@ export const CustomerSupportPage = () => {
                             <table className="table table-head-custom table-vertical-center" >
                                 <thead>
                                     <tr className="text-left">
-                                        <th className="pr-0" style={{ width: "50px" }}>Clients</th>
+                                        <th className="pr-0" style={{ width: "90px" }}>Clients</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -110,7 +110,7 @@ export const CustomerSupportPage = () => {
                                                 </div>
                                             </td>
                                             <td className="pl-0">
-                                                <span href="#" className="text-dark-75 font-weight-bolder text-hover-primary mb-1 font-size-lg">{userInfo[attendee].name}</span>
+                                                <span className="text-dark-75 font-weight-bolder text-hover-primary mb-1 font-size-lg">{userInfo[attendee].name}</span>
                                                 <span className="text-muted font-weight-bold text-muted d-block">{userInfo[attendee].title}</span>
                                             </td>
                                         </tr>
@@ -123,7 +123,7 @@ export const CustomerSupportPage = () => {
                             <table className="table table-head-custom table-vertical-center" >
                                 <thead>
                                     <tr className="text-left">
-                                        <th className="pr-0" style={{ width: "50px" }}>Finestudio</th>
+                                        <th className="pr-0" style={{ width: "90px" }}>Finestudio</th>
                                     </tr>
                                 </thead>
                                 <tbody>

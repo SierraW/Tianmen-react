@@ -6,6 +6,7 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 
+const em_company = db.collection("em_company");
 const em_chat = db.collection("em_chat");
 const em_addOn = db.collection("em_addo");
 const em_project = db.collection("em_proj");
@@ -32,6 +33,7 @@ function timestamp(date = new Date()) {
 
 export {
   db,
+  em_company,
   em_addOn,
   em_project,
   em_chat,

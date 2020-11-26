@@ -15,6 +15,10 @@ import { ProjectAddOnManagePage } from "./modules/ProjectSubscription/pages/Proj
 import { ProjectSubscriptionManagePage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionManagePage";
 import { ActGenPage } from "./modules/ActGen/pages/ActGenPage";
 
+const ManagementPage = lazy(() =>
+  import("./modules/Management/pages/ManagementPage")
+);
+
 const UserProfilepage = lazy(() =>
   import("./modules/UserProfile/UserProfilePage")
 );
@@ -35,14 +39,10 @@ export default function BasePage() {
         <ContentRoute path="/dashboard" component={MyProjectsPage} />
         <ContentRoute path="/builder" component={BuilderPage} />
         <ContentRoute path="/projects" component={MyProjectsPage} />
-        <ContentRoute path="/project-manager" component={ProjectManagerPage} />
         <ContentRoute path="/subscription" component={ProjectSubscriptionPage} />
-        <ContentRoute path="/act-gen" component={ActGenPage} />
         <ContentRoute path="/version" component={VersionPage} />
-        <Route path="/add-on-manage" component={ProjectAddOnManagePage} />
-        <Route path="/subscription-manage" component={ProjectSubscriptionManagePage} />
+        <Route path="/management" component={ManagementPage} />
         <Route path="/add-on" component={ProjectAddOnPage} />
-        <Route path="/news-notifications-manager" component={MyProjectsManagePage} />
         <Route path="/support" component={CustomerSupportPage} />
         <Route path="/user-profile" component={UserProfilepage} />
         <Route path="/project-creator/:id" component={ProjectCreatorPage} />
