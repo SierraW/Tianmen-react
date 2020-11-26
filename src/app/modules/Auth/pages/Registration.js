@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import { useFormik } from "formik";
 import { connect } from "react-redux";
 import * as Yup from "yup";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { FormattedMessage, injectIntl } from "react-intl";
 import * as auth from "../_redux/authRedux";
 import { register } from "../_redux/authCrud";
 
 const initialValues = {
-  fullname: "",
+  firstname: "",
+  lastname: "",
   email: "",
-  username: "",
+  code: "",
   password: "",
   changepassword: "",
   acceptTerms: false,
@@ -19,8 +20,17 @@ const initialValues = {
 function Registration(props) {
   const { intl } = props;
   const [loading, setLoading] = useState(false);
+  let history = useHistory();
   const RegistrationSchema = Yup.object().shape({
-    fullname: Yup.string()
+    firstname: Yup.string()
+      .min(3, "Minimum 3 symbols")
+      .max(50, "Maximum 50 symbols")
+      .required(
+        intl.formatMessage({
+          id: "AUTH.VALIDATION.REQUIRED_FIELD",
+        })
+      ),
+    lastname: Yup.string()
       .min(3, "Minimum 3 symbols")
       .max(50, "Maximum 50 symbols")
       .required(
@@ -30,14 +40,6 @@ function Registration(props) {
       ),
     email: Yup.string()
       .email("Wrong email format")
-      .min(3, "Minimum 3 symbols")
-      .max(50, "Maximum 50 symbols")
-      .required(
-        intl.formatMessage({
-          id: "AUTH.VALIDATION.REQUIRED_FIELD",
-        })
-      ),
-    username: Yup.string()
       .min(3, "Minimum 3 symbols")
       .max(50, "Maximum 50 symbols")
       .required(
@@ -66,6 +68,13 @@ function Registration(props) {
           "Password and Confirm Password didn't match"
         ),
       }),
+      code: Yup.string()
+      .length(32, "Should contains 32 characters.")
+      .required(
+        intl.formatMessage({
+          id: "AUTH.VALIDATION.REQUIRED_FIELD",
+        })
+      ),
     acceptTerms: Yup.bool().required(
       "You must accept the terms and conditions"
     ),
@@ -97,11 +106,37 @@ function Registration(props) {
     onSubmit: (values, { setStatus, setSubmitting }) => {
       setSubmitting(true);
       enableLoading();
-      register(values.email, values.fullname, values.username, values.password)
-        .then(({ data: { accessToken } }) => {
-          props.register(accessToken);
-          disableLoading();
-          setSubmitting(false);
+      
+      var name = `${values.lastname} ${values.firstname}`;
+      var name_slice = name.toLowerCase().split(" ");
+      var required_length = 8;
+      var each_slice_length = 4
+      var result = ""
+      name_slice.forEach(element => {
+        var i = 0;
+        while (i < element.length && i < each_slice_length) {
+          result += element.charAt(i++);
+          required_length -= 1;
+          if (required_length === 0) {
+            break;
+          }
+        }
+      })
+      if (required_length > 0) {
+        for (var i = 0 ; i < required_length; i++) {
+          result += `${Math.floor(Math.random() * Math.floor(10))}`;
+        }
+      }
+
+      register(result, values.email, values.password, `${values.firstname} ${values.lastname}`, values.code)
+        .then(({ data }) => {
+          if (data.success === "success") {
+            alert("Sign up successful!");
+            history.push("/auth/login");
+          } else {
+            console.log(data.message);
+            throw new Error(data.message);
+          }
         })
         .catch(() => {
           setSubmitting(false);
@@ -142,17 +177,34 @@ function Registration(props) {
         {/* begin: Fullname */}
         <div className="form-group fv-plugins-icon-container">
           <input
-            placeholder="Full name"
+            placeholder="First name"
             type="text"
             className={`form-control form-control-solid h-auto py-5 px-6 ${getInputClasses(
-              "fullname"
+              "firstname"
             )}`}
-            name="fullname"
-            {...formik.getFieldProps("fullname")}
+            name="firstname"
+            {...formik.getFieldProps("firstname")}
           />
-          {formik.touched.fullname && formik.errors.fullname ? (
+          {formik.touched.firstname && formik.errors.firstname ? (
             <div className="fv-plugins-message-container">
-              <div className="fv-help-block">{formik.errors.fullname}</div>
+              <div className="fv-help-block">{formik.errors.firstname}</div>
+            </div>
+          ) : null}
+        </div>
+
+        <div className="form-group fv-plugins-icon-container">
+          <input
+            placeholder="Last name"
+            type="text"
+            className={`form-control form-control-solid h-auto py-5 px-6 ${getInputClasses(
+              "lastname"
+            )}`}
+            name="lastname"
+            {...formik.getFieldProps("lastname")}
+          />
+          {formik.touched.lastname && formik.errors.lastname ? (
+            <div className="fv-plugins-message-container">
+              <div className="fv-help-block">{formik.errors.lastname}</div>
             </div>
           ) : null}
         </div>
@@ -176,25 +228,6 @@ function Registration(props) {
           ) : null}
         </div>
         {/* end: Email */}
-
-        {/* begin: Username */}
-        <div className="form-group fv-plugins-icon-container">
-          <input
-            placeholder="User name"
-            type="text"
-            className={`form-control form-control-solid h-auto py-5 px-6 ${getInputClasses(
-              "username"
-            )}`}
-            name="username"
-            {...formik.getFieldProps("username")}
-          />
-          {formik.touched.username && formik.errors.username ? (
-            <div className="fv-plugins-message-container">
-              <div className="fv-help-block">{formik.errors.username}</div>
-            </div>
-          ) : null}
-        </div>
-        {/* end: Username */}
 
         {/* begin: Password */}
         <div className="form-group fv-plugins-icon-container">
@@ -235,6 +268,25 @@ function Registration(props) {
           ) : null}
         </div>
         {/* end: Confirm Password */}
+
+        {/* begin: Username */}
+        <div className="form-group fv-plugins-icon-container">
+          <input
+            placeholder="Activation Code"
+            type="text"
+            className={`form-control form-control-solid h-auto py-5 px-6 ${getInputClasses(
+              "code"
+            )}`}
+            name="code"
+            {...formik.getFieldProps("code")}
+          />
+          {formik.touched.code && formik.errors.code ? (
+            <div className="fv-plugins-message-container">
+              <div className="fv-help-block">{formik.errors.code}</div>
+            </div>
+          ) : null}
+        </div>
+        {/* end: Username */}
 
         {/* begin: Terms and Conditions */}
         <div className="form-group">

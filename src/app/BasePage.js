@@ -5,15 +5,10 @@ import { BuilderPage } from "./pages/BuilderPage";
 import { MyProjectsPage } from "./modules/ProjectOverview/pages/MyProjectsPage";
 import { CustomerSupportPage } from "./modules/ProjectGeniusBar/pages/CustomerSupportPage";
 import { ProjectCreatorPage } from "./modules/ProjectCreator/pages/ProjectCreatorPage";
-import { ProjectManagerPage } from "./modules/ProjectManager/pages/ProjectManagerPage";
 import { ProjectSubscriptionPage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionPage";
 import { ProjectSubscriptionManagerPage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionManagerPage";
-import { MyProjectsManagePage } from "./modules/ProjectOverview/pages/MyProjectsManagePage";
 import { VersionPage } from "./modules/Version/pages/VersionPage";
 import { ProjectAddOnPage } from "./modules/ProjectSubscription/pages/ProjectAddOnPage";
-import { ProjectAddOnManagePage } from "./modules/ProjectSubscription/pages/ProjectAddOnManagePage";
-import { ProjectSubscriptionManagePage } from "./modules/ProjectSubscription/pages/ProjectSubscriptionManagePage";
-import { ActGenPage } from "./modules/ActGen/pages/ActGenPage";
 
 const ManagementPage = lazy(() =>
   import("./modules/Management/pages/ManagementPage")

@@ -39,13 +39,7 @@ export function userSec(user) {
 }
 
 const pageAccessLevel = {
-    "sm": 2,
-    "project-manager": 2,
-    "project-creator": 2,
-    "news-notifications-manager": 2,
-    "subscription-manage": 2,
-    "add-on-manage": 2,
-    "act-gen": 2
+    "management": 2,
 }
 
 export function pageSec(path, role_id) {
