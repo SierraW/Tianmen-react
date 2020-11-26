@@ -35,6 +35,7 @@ export default function ProjectOverviewWidgetNewsList({ className }) {
                                     <div className="d-flex flex-column align-items-cente py-2 w-75">
                                         <a
                                             href={item.url}
+                                            target="_blank"
                                             className="text-dark-75 font-weight-bold text-hover-primary font-size-lg mb-1"
                                         >
                                             {item.title}

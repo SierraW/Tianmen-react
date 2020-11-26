@@ -19,21 +19,25 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
     const [loadingImg, setLoadingImg] = useState(false);
     const [pic, setPic] = useState("");
     const [modalValuesLength, setModalValuesLength] = useState(false);
-    const [initialValues, setValues] = useState({
+    const [isValidRoomId, setValidRoomId] = useState(false);
+    const initialValues = {
         expiry: false,
         name: "",
         type: "",
-    });
+    }
 
     useEffect(() => {
-        if (roomData.id.length === 20) {
-            setPic(roomData.head);
-            formik.setValues({
-                expiry: roomData.expiry,
-                name: roomData.name,
-                type: roomData.type
-            });
-        }
+        em_chat.doc(roomData.id).get().then((doc) => {
+            if (doc.exists) {
+                setValidRoomId(true);
+                setPic(roomData.head);
+                formik.setValues({
+                    expiry: roomData.expiry,
+                    name: roomData.name,
+                    type: roomData.type
+                });
+            }
+        })
     }, [roomData])
 
     const submit = (values, setStatus, setSubmitting) => {
@@ -47,7 +51,7 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
 
         //dispatch(props.setUser(updatedUser));
         setTimeout(() => {
-            if (roomData.id.length === 20) {
+            if (isValidRoomId) {
                 em_chat.doc(roomData.id).set({
                     head: pic,
                     expiry: values.expiry,
@@ -166,7 +170,7 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
         >
             <div className="card-header d-flex justify-content-between">
                 <h3 className="card-title">
-                    {roomData.id.length === 20 ? `Project id: ${roomData.id}` : "New Project"}
+                    {isValidRoomId ? `Project id: ${roomData.id}` : "New Project"}
                 </h3>
                 <button
                     type="submit"
@@ -288,11 +292,19 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
                                 </div>
                             </div>
 
-                            <NavLink to={`/sm/${roomData.id}`}>
-                                <Button variant="primary" size="lg" className="mt-10">
-                                    Manage subscription & payment
-                                </Button>
-                            </NavLink>
+                            {isValidRoomId ? (
+                                <NavLink to={`/sm/${roomData.id}`}>
+                                    <Button variant="primary" size="lg" className="mt-10">
+                                        Manage subscription & payment
+                                    </Button>
+                                </NavLink>
+                            ) : (
+                                    <Button disabled variant="primary" size="lg" className="mt-10">
+                                        Manage subscription & payment
+                                    </Button>
+                                )}
+
+
 
                         </div>
                         <div className="col-xl-6 col-lg-6">

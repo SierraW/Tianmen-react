@@ -38,14 +38,16 @@ export const ProjectCreatorPage = ({ match }) => {
                 })
             if (match.params.id.length === 20) {
                 em_room(match.params.id).get().then(doc => {
-                    setRoomData({
-                        id: doc.id,
-                        head: doc.data().head,
-                        name: doc.data().name,
-                        type: doc.data().type,
-                        expiry: doc.data().expiry,
-                        attendees: doc.data().attendees
-                    });
+                    if (doc.exists) {
+                        setRoomData({
+                            id: doc.id,
+                            head: doc.data().head,
+                            name: doc.data().name,
+                            type: doc.data().type,
+                            expiry: doc.data().expiry,
+                            attendees: doc.data().attendees
+                        });
+                    }
                 })
             }
         }

@@ -3,7 +3,7 @@ import { useLocation, useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
 import { checkIsActive } from "../../../../_helpers";
 import { useSelector } from "react-redux";
-import { userSec } from "../../../../../services/securityClearanceService";
+import { userSec, pageSec } from "../../../../../services/securityClearanceService";
 
 export function HeaderMenu({ layoutProps }) {
     const location = useLocation();
@@ -17,6 +17,10 @@ export function HeaderMenu({ layoutProps }) {
     useEffect(() => {
         userSec(user)
         .then((result) => {
+            if (!pageSec(location.pathname.split("/")[1], result.role_id)) {
+                alert("Access denied.")
+                history.push("/dashboard");
+            }
             if ((result.role_id === 1 || result.role_id === 2) && result.com_id === 1) {
                 setSuperAdmin(true);
             } else {
@@ -55,6 +59,15 @@ export function HeaderMenu({ layoutProps }) {
             {/*end::1 Level*/}
 
             {
+                isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/act-gen')}`}>
+                <NavLink className="menu-link" to="/act-gen">
+                    <span className="menu-text">Activation Code</span>
+                    {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                </NavLink>
+            </li>) : ''
+            }
+
+            {
                 isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/news-notifications-manager')}`}>
                 <NavLink className="menu-link" to="/news-notifications-manager">
                     <span className="menu-text">News/Notis Manage</span>
@@ -81,8 +94,8 @@ export function HeaderMenu({ layoutProps }) {
 
             {/*begin::1 Level*/}
             {
-                isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/add-on/manage')}`}>
-                <NavLink className="menu-link" to="/add-on/manage">
+                isSuperAdmin ? (<li className={`menu-item menu-item-rel ${getMenuItemActive('/add-on-manage')}`}>
+                <NavLink className="menu-link" to="/add-on-manage">
                     <span className="menu-text">Add-On Manage</span>
                     {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
                 </NavLink>

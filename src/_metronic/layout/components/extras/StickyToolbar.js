@@ -16,7 +16,7 @@ export function StickyToolbar() {
               to="/dashboard"
               className="btn btn-sm btn-icon btn-bg-light btn-text-primary btn-hover-primary"
             >
-              <i class="flaticon2-menu-4"></i>
+              <i className="flaticon2-menu-4"></i>
             </Link>
           </li>
         </OverlayTrigger>

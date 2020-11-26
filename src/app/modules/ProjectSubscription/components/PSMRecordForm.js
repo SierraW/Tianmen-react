@@ -3,7 +3,6 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { paymentType } from '../data/PaymentTypeData';
-import { formatDate } from "../../../../services/datePrintingService";
 import { em_payment, timestamp } from "../../../../services/firebaseInit";
 import PropTypes from "prop-types";
 
@@ -14,11 +13,23 @@ export default function ProjectSubscriptionManagementRecordForm({ pid, estAmount
     function handleSubmit(event) {
         event.preventDefault();
         em_payment(pid).add({
-            amount: estAmount,
+            amount: Number.parseFloat(estAmount),
             date: billGates,
             type: billType,
             time: timestamp()
         })
+    }
+
+    function amountModified(newVal) {
+        if (newVal === "") {
+            setEstAmount(0);
+        } else if (newVal % 1 === 0) {
+            setEstAmount(Number.parseInt(newVal).toFixed(0));
+        } else if (newVal * 10 % 1 === 0) {
+            setEstAmount(Number.parseFloat(newVal).toFixed(1));
+        } else {
+            setEstAmount(Number.parseFloat(newVal).toFixed(2));
+        }
     }
 
     return <>
@@ -39,7 +50,7 @@ export default function ProjectSubscriptionManagementRecordForm({ pid, estAmount
                         type="number"
                         aria-describedby="inputGroupPrepend"
                         value={estAmount}
-                        onChange={(e) => setEstAmount(e.target.value)}
+                        onChange={(e) => amountModified(e.target.value)}
                         required
                     />
                     <Form.Control.Feedback type="invalid">
@@ -75,7 +86,6 @@ export default function ProjectSubscriptionManagementRecordForm({ pid, estAmount
 
 ProjectSubscriptionManagementRecordForm.propTypes = {
     pid: PropTypes.string.isRequired,
-    estAmount: PropTypes.number.isRequired,
     setEstAmount: PropTypes.func.isRequired,
     billGates: PropTypes.string.isRequired,
     setBillGates: PropTypes.func.isRequired

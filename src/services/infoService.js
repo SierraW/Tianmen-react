@@ -107,3 +107,28 @@ export function deleteNaughtys(session, id) {
         })
     })
 }
+
+export function getAllTitle() {
+    return [
+        {
+            value: 5,
+            text: "Developer"
+        },
+        {
+            value: 6,
+            text: "Project Manager"
+        },
+        {
+            value: 7,
+            text: "UI Designer"
+        },
+        {
+            value: 8,
+            text: "Account Manager"
+        },
+        {
+            value: 9,
+            text: "User"
+        }
+    ];
+}

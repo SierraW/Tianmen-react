@@ -29,7 +29,7 @@ export function FooterCompact({
               target="_blank"
               className="text-dark-75 text-hover-primary"
             >
-              Keenthemes
+              Finestudio
             </a>
           </div>
           {/* end::Copyright */}
@@ -44,7 +44,7 @@ export function FooterCompact({
               About
             </NavLink>
             <a
-              href="http://keenthemes.com/metronic"
+              href="http://finestuido.ca/"
               target="_blank"
               rel="noopener noreferrer"
               className="nav-link px-3"
@@ -52,7 +52,7 @@ export function FooterCompact({
               Team
             </a>
             <a
-              href="http://keenthemes.com/metronic"
+              href="http://finestuido.ca/"
               target="_blank"
               rel="noopener noreferrer"
               className="nav-link pl-3 pr-0"

@@ -15,7 +15,7 @@ export default function ProjectOverviewWidgetNotificationsList({ className }) {
             <div className={`card card-custom ${className}`}>
                 {/* Header */}
                 <div className="card-header border-0">
-                    <h3 className="card-title font-weight-bolder text-dark">Trends</h3>
+                    <h3 className="card-title font-weight-bolder text-dark">Notifications</h3>
                 </div>
 
                 {/* Body */}
