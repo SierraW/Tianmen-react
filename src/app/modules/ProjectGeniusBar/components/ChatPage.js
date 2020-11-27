@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import * as cs from "../../../../redux/csRedux";
 import { datePrettyPrint } from "../../../../services/datePrintingService";
 import { em_mashaji, timestamp } from "../../../../services/firebaseInit";
+import Button from "@material-ui/core/Button";
 import axios from "axios";
 import "../style/home.css";
 import PropTypes from "prop-types";
@@ -127,7 +128,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
                 .post("http://tianmengroup.com/server/universalUpload.php", formData)
                 .then(({ data }) => {
                     if (data.success === "success") {
-                        sendMessage( data.uri, data.type);
+                        sendMessage(data.uri, data.type);
                     } else {
                         alert(data.message);
                     }
@@ -214,12 +215,19 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
                         <input id="file" type="file" name="file" accept=".png, .jpg, .jpeg, .gif, .pdf, .pages, .doc, .docx, .zip" onchange="angular.element(this).scope().uploadFile(this.files)" />
                     </div> */}
 
-                    <input
-                        type="file"
-                        name="file"
-                        accept=".png, .jpg, .jpeg, .gif, .pdf, .pages, .doc, .docx, .zip"
-                        onChange={uploadFile}
-                    />
+                    <Button
+                        variant="contained"
+                        component="label"
+                    >
+                        Upload File
+                        <input
+                            type="file"
+                            name="file"
+                            hidden
+                            accept=".png, .jpg, .jpeg, .gif, .pdf, .pages, .doc, .docx, .zip"
+                            onChange={uploadFile}
+                        />
+                    </Button>
 
                     {/* <a href="#" className="btn btn-clean btn-icon btn-md mr-1">
                         <i className="flaticon2-photograph icon-lg"></i>

@@ -1,5 +1,19 @@
 [
     {
+        "version": "0.4a (ALPHA)",
+        "fix": [
+            "Project room user alignment."
+        ],
+        "add": [
+            "Activation Code Generator.", 
+            "Sign up function.",
+            "Management tab."
+        ],
+        "update": [
+            "Project room input file style."
+        ]
+    },
+    {
         "version": "0.3.1a (ALPHA)",
         "fix": ["Clear unused widgets."],
         "add": ["News-Notification manage section."],

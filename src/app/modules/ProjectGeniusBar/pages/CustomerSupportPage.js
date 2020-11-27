@@ -49,11 +49,12 @@ export const CustomerSupportPage = () => {
                         name: uInfo.display_name,
                         title: uInfo.title_name,
                         head: uInfo.head,
-                        company: uInfo.company_name
+                        company: uInfo.company_name,
+                        com_id: uInfo.com_id
                     }
                 })
                 setUserInfo({
-                    ...attendees, ...newUserInfos
+                    ...userInfo, ...newUserInfos
                 });
             })
         updateUserInfoArr = [];
@@ -68,11 +69,12 @@ export const CustomerSupportPage = () => {
     };
 
     function clientAttendee() {
-        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].company !== "Finestudio" : false) : [];
+        console.log("uinfo", userInfo);
+        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].com_id !== "1" : false) : [];
     }
 
     function fsAttendee() {
-        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].company === "Finestudio" : false) : [];
+        return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].com_id === "1" : false) : [];
     }
 
     function getHeadUri(user) {

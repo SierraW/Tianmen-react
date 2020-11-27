@@ -22,9 +22,9 @@ export function FooterCompact({
             <span className="text-muted font-weight-bold mr-2">
               {today} &copy;
             </span>
-            {` `}
+            Miracle Planet, Powered By&nbsp;
             <a
-              href="http://keenthemes.com/metronic"
+              href="http://www.finestudio.ca/"
               rel="noopener noreferrer"
               target="_blank"
               className="text-dark-75 text-hover-primary"
