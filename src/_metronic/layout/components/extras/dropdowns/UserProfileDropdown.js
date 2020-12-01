@@ -90,7 +90,8 @@ export function UserProfileDropdown() {
         </>
 
         <div className="navi navi-spacer-x-0 pt-5">
-          <Link aria-disabled to="/user-profile" className="navi-item px-8 cursor-pointer">
+          {/*<Link aria-disabled to="/user-profile" className="navi-item px-8 cursor-pointer">*/}
+          <div  className="navi-item px-8 cursor-pointer">
             <div className="navi-link">
               <div className="navi-icon mr-2">
                 <i className="flaticon2-calendar-3 text-success" />
@@ -107,7 +108,8 @@ export function UserProfileDropdown() {
                 </div>
               </div>
             </div>
-          </Link>
+          </div>
+          {/*</Link>*/}
 
           {/* <a className="navi-item px-8">
             <div className="navi-link">

@@ -24,7 +24,7 @@ export function FooterCompact({
             </span>
             Miracle Planet, Powered By&nbsp;
             <a
-              href="http://www.finestudio.ca/"
+              href="https://www.finestudio.ca/"
               rel="noopener noreferrer"
               target="_blank"
               className="text-dark-75 text-hover-primary"
@@ -44,7 +44,7 @@ export function FooterCompact({
               About
             </NavLink>
             <a
-              href="http://finestuido.ca/"
+              href="https://www.finestudio.ca/"
               target="_blank"
               rel="noopener noreferrer"
               className="nav-link px-3"
@@ -52,7 +52,7 @@ export function FooterCompact({
               Team
             </a>
             <a
-              href="http://finestuido.ca/"
+              href="https://finestudio.ca/#contact"
               target="_blank"
               rel="noopener noreferrer"
               className="nav-link pl-3 pr-0"

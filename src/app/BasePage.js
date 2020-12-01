@@ -10,6 +10,10 @@ import { ProjectSubscriptionManagerPage } from "./modules/ProjectSubscription/pa
 import { VersionPage } from "./modules/Version/pages/VersionPage";
 import { ProjectAddOnPage } from "./modules/ProjectSubscription/pages/ProjectAddOnPage";
 
+const TimelinePage = lazy(() => 
+  import("./modules/Timeline")
+);
+
 const ManagementPage = lazy(() =>
   import("./modules/Management/pages/ManagementPage")
 );
@@ -37,6 +41,7 @@ export default function BasePage() {
         <ContentRoute path="/subscription" component={ProjectSubscriptionPage} />
         <ContentRoute path="/version" component={VersionPage} />
         <Route path="/management" component={ManagementPage} />
+        <Route path="/timeline" component={TimelinePage} />
         <Route path="/add-on" component={ProjectAddOnPage} />
         <Route path="/support" component={CustomerSupportPage} />
         <Route path="/user-profile" component={UserProfilepage} />

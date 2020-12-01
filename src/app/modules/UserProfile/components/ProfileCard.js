@@ -83,17 +83,17 @@ export function ProfileCard() {
               {/* begin::Contact */}
               <div className="py-9">
                 <div className="d-flex align-items-center justify-content-between mb-2">
-                  <span className="font-weight-bold mr-2">Email:</span>
+                  <span className="font-weight-bold mr-2">Role:</span>
                   <span className="text-muted text-hover-primary">
                     {user.role_name}
                   </span>
                 </div>
                 <div className="d-flex align-items-center justify-content-between mb-2">
-                  <span className="font-weight-bold mr-2">Phone:</span>
+                  <span className="font-weight-bold mr-2">Title:</span>
                   <span className="text-muted">{user.title_name}</span>
                 </div>
                 <div className="d-flex align-items-center justify-content-between">
-                  <span className="font-weight-bold mr-2">Location:</span>
+                  <span className="font-weight-bold mr-2">Company:</span>
                   <span className="text-muted">{user.company_name}</span>
                 </div>
               </div>

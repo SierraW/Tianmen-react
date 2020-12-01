@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button';
 export default function ProjectSubscriptionCard({ className, title, subtitle, desList, pid, price }) {
 
     function subscribe() {
-        alert(`you've select ${pid}`);
+        //  alert(`you've select ${pid}`);
     }
 
     return <>

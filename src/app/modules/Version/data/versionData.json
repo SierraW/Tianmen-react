@@ -1,5 +1,17 @@
 [
     {
+        "version": "0.5b (BETA)",
+        "fix": [
+            "Term and Contact pointed to wrong url."
+        ],
+        "add": [
+            
+        ],
+        "update": [
+            "Sweet alert at access denied and session expired."
+        ]
+    },
+    {
         "version": "0.4a (ALPHA)",
         "fix": [
             "Project room user alignment."
