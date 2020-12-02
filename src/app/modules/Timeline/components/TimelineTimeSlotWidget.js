@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import TimelineTimeSlot from "./TimelineTimeSlot";
 import TimelineDurationField from "./TimelineDurationField";
 import Button from '@material-ui/core/Button';
@@ -15,11 +15,26 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function TiemlineTimeSlotWidget({initTimeslots, identifier, setTimeline}) {
+export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
     const classes = useStyles();
     const [timeslots, setTimeslot] = useState(initTimeslots);
     const [duration, setDuration] = useState(60);
     const [tlcWarning, setTlcWarn] = useState(false);
+    const [uncompleteWarning, setUnWarning] = useState(false);
+
+    useEffect(() => {
+        var empty = false;
+        for (var i = 0; i < timeslots.length; i++) {
+            if (timeslots[i].from === "") {
+                empty = true;
+                break;
+            }
+        }
+        setUnWarning(empty);
+        if (!tlcWarning && !empty) {
+            setTimeline(timeslots);
+        }
+    }, [timeslots])
 
     function swap(items, leftIndex, rightIndex) {
         var temp = items[leftIndex];
@@ -177,9 +192,19 @@ export default function TiemlineTimeSlotWidget({initTimeslots, identifier, setTi
         {
             tlcWarning ? (
                 <Zoom in={tlcWarning}>
-                    <Alert className="mb-3" severity="warning">
-                        <AlertTitle>Timeline Merging</AlertTitle>
-                    Your timelines have one or more conflict(s), they will be merge at submit.
+                    <Alert className="my-3" severity="error">
+                        <AlertTitle>Timeline Conflict</AlertTitle>
+                    Your timelines have one or more conflict(s), they will not be save until fix.
+                    </Alert>
+                </Zoom>
+            ) : ""
+        }
+        {
+            uncompleteWarning ? (
+                <Zoom in={uncompleteWarning}>
+                    <Alert className="my-3" severity="warning">
+                        <AlertTitle>Timeline Uncomplete</AlertTitle>
+                    Your timelines have one or more record(s) empty, they will not be save until fix.
                     </Alert>
                 </Zoom>
             ) : ""
