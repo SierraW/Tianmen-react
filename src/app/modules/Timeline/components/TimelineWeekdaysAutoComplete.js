@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-const weekdays = [
+const daysInWeek = [
     { title: "Monday", value: 1 },
     { title: "Tuesday", value: 2 },
     { title: "Wednesday", value: 3 },
@@ -12,8 +12,8 @@ const weekdays = [
     { title: "Sunday", value: 0 }
 ]
 
-export default function TimelineWeekdaysAutoComplete() {
-    const [day, setDay] = useState([]);
+export default function TimelineWeekdaysAutoComplete({ weekdays, setWeekday }) {
+    const [day, setDay] = useState(weekdays);
 
     function insertionSort(inputArr) {
         let n = inputArr.length;
@@ -32,8 +32,9 @@ export default function TimelineWeekdaysAutoComplete() {
     }
 
     function handleChange(newVal) {
-        var myDay = [...newVal];
-        setDay(insertionSort(myDay));
+        var myDay = insertionSort([...newVal]);
+        setDay(myDay);
+        setWeekday(myDay);
     }
 
     return (
@@ -42,7 +43,7 @@ export default function TimelineWeekdaysAutoComplete() {
             onChange={(e, newVal) => handleChange(newVal)}
             multiple
             id="tl-wd-ac"
-            options={weekdays}
+            options={daysInWeek}
             getOptionLabel={(option) => option.title}
             style={{ width: "100%" }}
             renderInput={(params) => <TextField {...params} label="Weekdays" variant="outlined" />}

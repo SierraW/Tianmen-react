@@ -6,9 +6,8 @@ import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
     button: {
-        height: "80%",
         marginTop: theme.spacing(1),
-        marginBottom: 0
+        marginBottom: 0,
     },
     inputField: {
         marginRight: theme.spacing(1),
@@ -24,9 +23,11 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
 
     useEffect(() => {
         setFrom(initFrom);
+        compareTwo(initFrom, initTo);
     }, [initFrom]);
     useEffect(() => {
         setTo(initTo);
+        compareTwo(initFrom, initTo);
     }, [initTo]);
 
     const classes = useStyles();
@@ -156,6 +157,10 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
     }
 
     function compareTwo(lhs, rhs) {
+        if (lhs === "" || rhs === "") {
+            setDiff("0 hours and 0 minutes");
+            return false;
+        }
         const lhsMin = lhs.slice(0,2), lhsSec = lhs.slice(-2);
         const rhsMin = rhs.slice(0,2), rhsSec = rhs.slice(-2);
         
@@ -209,6 +214,6 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
             variant="outlined"
         />
         
-        <Button className={classes.button} onClick={() => handleDelete()} variant="outlined"><DeleteIcon className="text-danger" /></Button>
+        <Button className={classes.button} onClick={() => handleDelete()}><DeleteIcon className="text-danger" /></Button>
         </div>;
 }

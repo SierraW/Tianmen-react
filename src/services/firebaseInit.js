@@ -10,6 +10,9 @@ const em_company = db.collection("em_company");
 const em_chat = db.collection("em_chat");
 const em_addOn = db.collection("em_addo");
 const em_project = db.collection("em_proj");
+const em_generalTimeline = db.collection("em_generalTimeline");
+const em_specialTimeline = db.collection("em_specialTImeline");
+const em_excludedTimeline = db.collection("em_excludedTimeline");
 
 function em_room(roomId) {
   return em_chat.doc(roomId);

@@ -26,7 +26,7 @@ export default function TimelineDurationField({ duration, setDuration }) {
 
     return <TextField
         style={{width: "100%"}}
-        label="Duration (min)"
+        label="Duration for each meeting time (min)"
         type="number"
         value={tempDur}
         onChange={(e) => setTempDur(e.target.value)}

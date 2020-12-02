@@ -1,33 +1,24 @@
 import React, { useState } from "react";
-import TimelineWeekdaysAutoComplete from "./TimelineWeekdaysAutoComplete";
 import TimelineTimeSlot from "./TimelineTimeSlot";
 import TimelineDurationField from "./TimelineDurationField";
-import TimelineDateField from "./TimelineDateField";
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
-import { Alert, AlertTitle } from '@material-ui/lab';
 import Zoom from '@material-ui/core/Zoom';
-import CustomVCModal from "../../Modal/CustomVCModal";
-import TimelineWeekdayForm from "./TimelineWeekdayForm";
-import TimelineTimeline from "./TimelineTimeline";
+import { Alert, AlertTitle } from '@material-ui/lab';
 
 const useStyles = makeStyles(theme => ({
     button: {
         marginTop: theme.spacing(1),
-        width: "40%"
     },
     alert: {
         margin: `${theme.spacing(1)} 0`,
     }
 }));
 
-export default function TimelineManageForm() {
+export default function TiemlineTimeSlotWidget({initTimeslots, identifier, setTimeline}) {
     const classes = useStyles();
-    const [weekdays, setWeekday] = useState([]);
-    const [timelines, setTimeslot] = useState([]);
-    const [excluedes, setExcluede] = useState([]);
+    const [timeslots, setTimeslot] = useState(initTimeslots);
     const [duration, setDuration] = useState(60);
-    const [showSp, setShowSp] = useState(false);
     const [tlcWarning, setTlcWarn] = useState(false);
 
     function swap(items, leftIndex, rightIndex) {
@@ -71,10 +62,10 @@ export default function TimelineManageForm() {
     }
 
     function timeslotsMerge() {
-        if (timelines.length < 2) {
-            return timelines;
+        if (timeslots.length < 2) {
+            return timeslots;
         }
-        var sortedTimelines = quickSort(timelines, 0, timelines.length - 1);
+        var sortedTimelines = quickSort(timeslots, 0, timeslots.length - 1);
         var from = sortedTimelines[0].from;
         var to = sortedTimelines[0].to;
         var result = [];
@@ -123,7 +114,7 @@ export default function TimelineManageForm() {
     }
 
     function splitTime() {
-        var timeslots = timeslotsMerge();
+        var timelines = timeslotsMerge();
         var hour = 0;
         var min = duration;
         while (min >= 60) {
@@ -131,13 +122,12 @@ export default function TimelineManageForm() {
             hour += 1;
         }
         var result = [];
-        for (var i = 0; i < timeslots.length; i++) {
-            var from = timeslots[i].from;
-            var to = timeslots[i].to;
+        for (var i = 0; i < timelines.length; i++) {
+            var from = timelines[i].from;
+            var to = timelines[i].to;
             while (timeAddition(from, hour, min, to) !== false) {
-                console.log("here");
                 const end = timeAddition(from, hour, min, to);
-                result.push({from, to: end});
+                result.push({ from, to: end });
                 from = end;
             }
         }
@@ -153,7 +143,7 @@ export default function TimelineManageForm() {
             resultMin -= 60;
         }
         const resultTime = `${resultHour < 10 ? `0${resultHour}` : resultHour}:${resultMin < 10 ? `0${resultMin}` : resultMin}`;
-        return compareTime(resultTime, limit) ? false : resultTime; 
+        return compareTime(resultTime, limit) ? false : resultTime;
     }
 
     function compareTime(lhs, rhs) {
@@ -169,40 +159,21 @@ export default function TimelineManageForm() {
     }
 
     function addTimeslot() {
-        setTimeslot([...timelines, { from: "", to: "" }]);
+        setTimeslot([...timeslots, { from: "", to: "" }]);
     }
     function modifyTimeslot(pos, newValue) {
-        var myTimeslots = [...timelines];
+        var myTimeslots = [...timeslots];
         myTimeslots[pos] = { ...myTimeslots[pos], ...newValue };
         setTimeslot(myTimeslots);
         setTlcWarn(checkTimeslotConflict(myTimeslots));
     }
-    function addExcluede() {
-        setExcluede([...excluedes, excluedes.length + 1]);
-    }
-    function submit() {
-        console.log("timeslots", timelines);
-    }
     function handleDelete(index) {
-        var myTimeslots = [...timelines];
+        var myTimeslots = [...timeslots];
         myTimeslots.splice(index, 1)
         setTimeslot(myTimeslots);
     }
-    function checkTimeslots() {
-        if (timelines.length === 0) {
-            return true;
-        }
-        for (var i = 0; i < timelines.length; i++) {
-            if (timelines[i].from === "") {
-                continue;
-            }
-            return false;
-        }
-        return true;
-    }
 
     return <>
-        <CustomVCModal body={() => (<TimelineWeekdayForm weekdays={weekdays} timeslots={timelines} />)} show={showSp} onHide={() => setShowSp(false)} />
         {
             tlcWarning ? (
                 <Zoom in={tlcWarning}>
@@ -213,12 +184,11 @@ export default function TimelineManageForm() {
                 </Zoom>
             ) : ""
         }
-        <TimelineWeekdaysAutoComplete weekdays={weekdays} setWeekday={setWeekday} />
         <Button variant="outlined" color="secondary" onClick={(() => addTimeslot())} className={classes.button}>
             + Timeslots
         </Button>
         {
-            timelines.map((value, index) => (
+            timeslots.map((value, index) => (
                 <TimelineTimeSlot
                     key={index}
                     initFrom={value.from}
@@ -229,7 +199,7 @@ export default function TimelineManageForm() {
             ))
         }
         {
-            timelines.length > 0 ? (
+            timeslots.length > 0 ? (
                 <>
                     {
                         tlcWarning ? (
@@ -244,41 +214,7 @@ export default function TimelineManageForm() {
                     <Button variant="outlined" className={classes.button} color="primary" onClick={(() => splitTime())}>
                         Auto Split Based On Duration
                     </Button>
-                    <Button variant="outlined" className={classes.button} color="primary" onClick={(() => setShowSp(true))}>
-                        Manage Specific Day
-                    </Button>
                 </>
-            ) : ""
-        }
-        <Button variant="outlined" color="secondary" onClick={(() => addExcluede())} className={classes.button}>
-            + Exclude Time
-        </Button>
-        {
-            excluedes.length > 0 ? (
-                <div className="row">
-                    {
-                        excluedes.map(value => (
-                            <TimelineDateField key={value} className="col-lg-4 px-3" />
-                        ))
-                    }
-                </div>
-            ) : ""
-
-        }
-        <Button variant="outlined" color="secondary" onClick={(() => submit())} className={classes.button}>
-            Submit
-        </Button>
-        {
-            weekdays.length > 0 && !checkTimeslots() ? (
-                <div className="d-flex">
-                    {
-                        weekdays.map((weekday, index) => (
-                            <div key={index} className="p-6">
-                                <TimelineTimeline timelines={timelines} weekday={weekday} />
-                            </div>
-                        ))
-                    }
-                </div>
             ) : ""
         }
     </>;
