@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function TimelineManageForm({initWeekdays, initTimelines, initSpe,  initExc, commitChanges}) {
+export default function TimelineManageForm({ initWeekdays, initTimelines, initSpe, initExc, commitChanges }) {
     const classes = useStyles();
     const [weekdays, setWeekday] = useState(initWeekdays);
     const [timelines, setTimeline] = useState(initTimelines);
@@ -35,24 +35,14 @@ export default function TimelineManageForm({initWeekdays, initTimelines, initSpe
     }, [weekdays, timelines, specialTimelines, excludes]);
 
     function handleWeekdaysChange(newWeekday) {
-        if (newWeekday.length < weekdays.length) {
-            weekdays.forEach((weekday) => {
-                if (!newWeekday.includes(weekday)) {
-                    delete specialTimelines[weekday.title];
-                    setWeekday(newWeekday);
-                    return;
-                }
-            })
-        } else {
-            setWeekday(newWeekday)
-        }
+        setWeekday(newWeekday);
     }
 
     function modifySpecialTimeline(id, timelines) {
         if (timelines) {
-            setSpecialTimeline({...specialTimelines, [id]: timelines});
+            setSpecialTimeline({ ...specialTimelines, [id]: timelines });
         } else {
-            var mySTL = {...specialTimelines};
+            var mySTL = { ...specialTimelines };
             delete mySTL[id];
             setSpecialTimeline(mySTL);
         }

@@ -3,13 +3,13 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const daysInWeek = [
+    "Sunday",
     "Monday",
     "Tuesday",
     "Wednesday",
     "Thursday",
     "Friday",
-    "Saturday",
-    "Sunday"
+    "Saturday"
 ]
 
 export default function TimelineWeekdaysAutoComplete({ weekdays, setWeekday }) {
@@ -22,7 +22,7 @@ export default function TimelineWeekdaysAutoComplete({ weekdays, setWeekday }) {
                 let current = inputArr[i];
                 // The last element of our sorted subarray
                 let j = i-1; 
-                while ((j > -1) && (current.value < inputArr[j].value)) {
+                while ((j > -1) && (daysInWeek.findIndex(day => day === current) < daysInWeek.findIndex(day => day === inputArr[j]))) {
                     inputArr[j+1] = inputArr[j];
                     j--;
                 }
