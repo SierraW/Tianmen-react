@@ -4,14 +4,12 @@ import ProjectOverviewWidgetNotificationsList from "../components/POWidgetNotifi
 import { useSubheader } from "../../../../_metronic/layout";
 import { LayoutSplashScreen } from "../../../../_metronic/layout";
 import { delay } from "../../../../services/delayLoading";
-import { useSelector } from "react-redux";
 import ProjectOverviewHybridTable from "../components/POHybridTable";
 
 export function MyProjectsManagePage() {
   const suhbeader = useSubheader();
   suhbeader.setTitle("News and Notifications Manage");
   const [loading, setLoading] = useState(true);
-  const uid = useSelector((state) => state.auth.user.id);
 
   useEffect(() => {
     delay().then(() => setLoading(false));

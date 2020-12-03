@@ -3,13 +3,13 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const daysInWeek = [
-    { title: "Monday", value: 1 },
-    { title: "Tuesday", value: 2 },
-    { title: "Wednesday", value: 3 },
-    { title: "Thursday", value: 4 },
-    { title: "Friday", value: 5 },
-    { title: "Saturday", value: 6 },
-    { title: "Sunday", value: 0 }
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
 ]
 
 export default function TimelineWeekdaysAutoComplete({ weekdays, setWeekday }) {
@@ -44,7 +44,7 @@ export default function TimelineWeekdaysAutoComplete({ weekdays, setWeekday }) {
             multiple
             id="tl-wd-ac"
             options={daysInWeek}
-            getOptionLabel={(option) => option.title}
+            getOptionLabel={(option) => option}
             style={{ width: "100%" }}
             renderInput={(params) => <TextField {...params} label="Weekdays" variant="outlined" />}
         />
