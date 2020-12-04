@@ -47,14 +47,12 @@ export default function TimelineTimeline({ weekdays, timelines, specialTimelines
         day.setTime(day.getTime() + day.getTimezoneOffset() * 60 * 1000);
         const weekdayNow = day.getDay();
         for (var i = 0; i < result.length; i++) {
-            console.log(daysInWeek.findIndex(value => value === result[i].title), weekdayNow);
             if (daysInWeek.findIndex(value => value === result[i].title) >= weekdayNow) {
                 if (i === 0) {
                     break;
                 }
                 var elementNeedsToMove = result.splice(i, result.length - i);
                 result = elementNeedsToMove.concat(result);
-                console.log("result" , result);
             }
         }
         setCombinedTimeline(result);
