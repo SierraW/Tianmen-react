@@ -161,8 +161,8 @@ export default function TimelineExclusiveForm({ commitExclude, initExclude }) {
                                         margin="normal"
                                         variant="outlined"
                                     />
-                                    <Button className={classes.inputButton} onClick={() => handleEditDetail(index)} variant="outlined"><EditIcon className="text-primary" /></Button>
-                                    <Button className={classes.inputButton} onClick={() => handleDelete(index)} variant="outlined"><DeleteIcon className="text-danger" /></Button>
+                                    <Button className={classes.inputButton} onClick={() => handleEditDetail(index)} ><EditIcon className="text-primary" /></Button>
+                                    <Button className={classes.inputButton} onClick={() => handleDelete(index)} ><DeleteIcon className="text-danger" /></Button>
                                 </div>
                                 {
                                     exclude.timelines.length > 0 ? (

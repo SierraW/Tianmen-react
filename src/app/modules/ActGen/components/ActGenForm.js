@@ -20,7 +20,7 @@ export default function ActGenForm() {
         var companyId = 0;
         var success = true;
         if (/^\s*$/.test(company)) {
-            alert("Name cannot be empty.");
+            alert("Company name cannot be empty.");
             return;
         }
         await em_company.where("name", "==", company).get().then((querySnapshot) => {

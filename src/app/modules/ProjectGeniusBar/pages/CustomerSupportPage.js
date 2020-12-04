@@ -69,7 +69,6 @@ export const CustomerSupportPage = () => {
     };
 
     function clientAttendee() {
-        console.log("uinfo", userInfo);
         return attendees ? attendees.filter(userId => userInfo[userId] ? userInfo[userId].com_id !== "1" : false) : [];
     }
 

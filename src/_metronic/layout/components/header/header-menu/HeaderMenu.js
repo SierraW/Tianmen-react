@@ -131,7 +131,7 @@ export function HeaderMenu({ layoutProps }) {
                                 aria-haspopup="true"
                             >
                                 <NavLink className="menu-link" to="/management/news-notifications">
-                                    <span className="menu-text">News/Notis Manage</span>
+                                    <span className="menu-text">News/Notice Manage</span>
                                     {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
                                 </NavLink>
                             </li>

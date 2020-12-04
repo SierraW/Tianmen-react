@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Paper from '@material-ui/core/Paper';
+import Zoom from '@material-ui/core/Zoom';
 import Button from '@material-ui/core/Button';
 import { useSubheader } from "../../../../_metronic/layout";
 import { em_tl, em_timeline } from "../../../../services/firebaseInit";
@@ -21,13 +21,22 @@ export function TimelineReservationPage() {
     const suhbeader = useSubheader();
     suhbeader.setTitle("Reservation");
     const [loading, setLoading] = useState(true);
+    const [transTime, setTransTime] = useState(false);
     const [timelines, setTimeline] = useState({});
     const [preferUserLogin, setPUL] = useState(false);
     const [avaliableDates, setAvaliableDate] = useState([]);
-    const [selectedIndex, setSelectedIndex] = useState(-1);
+    const [selectedItems, setSelectedItem] = useState([]);
     const dateArr = generateDatesFromNow();
 
     useEffect(() => {
+        function handleOutput(result) {
+            var output = {};
+            result.forEach((timelineObj) => {
+                output[timelineObj.uid] = generateTimelineWithDates(timelineObj);
+            })
+            return output;
+        }
+
         if (preferUserLogin === false) {
             var unsubscribe = em_tl.onSnapshot((querySnapshot) => {
                 refreshAvDate();
@@ -41,11 +50,7 @@ export function TimelineReservationPage() {
                         excludes: doc.data().excludes
                     })
                 })
-                var output = {};
-                result.forEach((timelineObj) => {
-                    output[timelineObj.uid] = generateTimelineWithDates(timelineObj);
-                })
-                setTimeline(output);
+                setTimeline(handleOutput(result));
             })
         } else {
             var unsubscribe = em_timeline(preferUserLogin).onSnapshot((doc) => {
@@ -59,11 +64,7 @@ export function TimelineReservationPage() {
                     specialTimelines: doc.data().specialTimelines,
                     excludes: doc.data().excludes
                 })
-                var output = {};
-                result.forEach((timelineObj) => {
-                    output[timelineObj.uid] = generateTimelineWithDates(timelineObj);
-                })
-                setTimeline(output);
+                setTimeline(handleOutput(result));
             })
         }
 
@@ -72,10 +73,25 @@ export function TimelineReservationPage() {
         };
     }, [preferUserLogin]);
 
+    useEffect(() => {
+        if (selectedItems.length > 0) {
+            setTransTime(true);
+        }
+    }, [selectedItems])
 
-    function handleSelect(index) {
-        setSelectedIndex(index);
-        console.log(getAllMatchedTimeline(index));
+    function handleSelectDay(index) {
+        setTransTime(false);
+        if (selectedItems.length > 0) {
+            setTimeout(() => {
+                setSelectedItem(getAllMatchedTimeline(index));
+            }, 150)
+        } else {
+            setSelectedItem(getAllMatchedTimeline(index));
+        }
+    }
+
+    function handleSelectTime(index) {
+        alert(`Your've selected ${selectedItems[index].login} ${selectedItems[index].timeline.from} -> ${selectedItems[index].timeline.to}`);
     }
 
     function refreshAvDate() {
@@ -102,8 +118,14 @@ export function TimelineReservationPage() {
             if (timelines.hasOwnProperty(key)) keys.push(key);
         }
         for (var i = 0; i < keys.length; i++) {
-            resultTimeline.push(timelines[keys[i]][index]);
+            timelines[keys[i]][index].forEach(timeline => {
+                resultTimeline.push({
+                    login: keys[i],
+                    timeline
+                });
+            })
         }
+        resultTimeline.sort((a, b) => a.timeline.from.localeCompare(b.timeline.from));
         return resultTimeline;
     }
 
@@ -128,7 +150,7 @@ export function TimelineReservationPage() {
         for (var i = 0; i < days.length; i++) {
             const date = days[i];
             const day = new Date(date);
-            day.setTime( day.getTime() + day.getTimezoneOffset()*60*1000 );
+            day.setTime(day.getTime() + day.getTimezoneOffset() * 60 * 1000);
             const weekday = daysInWeek[day.getDay()];
             if (excludesMap[date]) {
                 result.push(excludesMap[date]);
@@ -156,15 +178,33 @@ export function TimelineReservationPage() {
     return <>
         <div className="card card-body">
             <h3 className="text-center">With whom and when would you like to meet?</h3>
-            <div className="d-flex">
+            <div className="d-flex align-items-center justify-content-between">
                 {
                     dateArr.map((date, index) => (
                         avaliableDates[index] === 1 ? (
-                            <Button key={index} variant="outlined" onClick={() => handleSelect(index)}>{date}</Button>
+                            <Button key={index} className="p-6" variant="outlined" onClick={() => handleSelectDay(index)}><h2 style={{margin: 0, padding: 0}}>{date}</h2></Button>
                         ) : (
-                            <Button key={index} variant="outlined" disabled >{date}</Button>
-                        )
+                                <Button key={index} className="p-6 text-lg font-weight-bold" variant="outlined" disabled >{date}</Button>
+                            )
                     ))
+                }
+            </div>
+            <div className="d-flex">
+                {
+                    selectedItems.length > 0 ? (
+                        <>
+                            {
+                                selectedItems.map((item, index) => (
+                                    <Zoom key={index} in={transTime} style={{ transitionDelay: transTime ? `${index * 100}ms` : '0ms' }}>
+                                        <Button variant="outlined" onClick={() => handleSelectTime(index)}>{item.timeline.from} To {item.timeline.to}</Button>
+                                    </Zoom>
+                                ))
+                            }
+                        </>
+                    ) : ""
+                }
+                {
+
                 }
             </div>
             <div className="d-flex">

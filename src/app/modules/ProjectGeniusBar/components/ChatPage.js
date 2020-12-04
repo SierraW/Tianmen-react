@@ -53,8 +53,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     }
 
     useEffect(() => {
-        dispatch(cs.actions.setLastViewStamp(roomId));
-        em_mashaji(roomId).orderBy("time").onSnapshot((querySnapshot) => {
+        em_mashaji(roomId).orderBy("time").limit(100).onSnapshot((querySnapshot) => {
             var items = []
             querySnapshot.forEach((doc) => {
                 items.push({
@@ -85,15 +84,20 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     }
 
     useEffect(() => {
+        dispatch(cs.actions.setLastViewStamp(roomId));
         scrollToBottom();
     }, [messages]);
 
     function renderMessage(type, msgBody) {
         switch (type) {
             case 1:
-                return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px">{msgBody}</div>
+                if (/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/.test(msgBody)) {
+                    return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} target="_blank" >{msgBody}</a></div>
+                } else {
+                    return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px">{msgBody}</div>
+                }
             case 2:
-                return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} target="_blank" style={{ background: `url(${msgBody})`, backgroundRepeat: 'no-repeat', display: 'inline-block', overflow: 'hidden', width: '200px', height: '100px', backgroundSize: 'cover' }}></a></div>
+                return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} target="_blank" ><img className="rounded img-fluid" src={msgBody} alt={msgBody}></img></a></div>
             case 3:
                 return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} download>附件: {msgBody}</a></div>;
         }
@@ -123,6 +127,10 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
         formData.append("session", session);
         formData.append("target", "uploads");
 
+        uploadFD(formData);
+    }
+
+    function uploadFD(formData) {
         setTimeout(() => {
             axios
                 .post("http://tianmengroup.com/server/universalUpload.php", formData)
@@ -136,9 +144,24 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
                 .catch(() => {
                     alert("Upload failed");
                 });
-        }, 1000)
+        }, 100)
+    }
 
+    function thisHasNoChanceToWork(e) {
+        e.preventDefault();
+        if (e.clipboardData && e.clipboardData.items) {
+            var items = e.clipboardData.items;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    var file = items[i].getAsFile(), data = new FormData()
+                    data.append('file', file);
+                    data.append("session", session);
+                    data.append("target", "uploads");
 
+                    uploadFD(data);
+                }
+            }
+        }
     }
 
 
@@ -207,7 +230,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
         <div className="card-footer align-items-center">
 
 
-            <textarea className="form-control border-0 p-0" rows="2" placeholder="Type a message" onKeyDown={(event) => keyListner(event)} onKeyUp={(event) => keyListner(event)} value={inputMsg} onChange={(event) => handleChange(event)} id="txtIn"></textarea>
+            <textarea className="form-control border-0 p-0" rows="2" placeholder="Type a message" onPaste={(event) => thisHasNoChanceToWork(event)} onKeyDown={(event) => keyListner(event)} onKeyUp={(event) => keyListner(event)} value={inputMsg} onChange={(event) => handleChange(event)} id="txtIn"></textarea>
             <div className="d-flex align-items-center justify-content-between mt-5">
                 <div className="mr-3">
 

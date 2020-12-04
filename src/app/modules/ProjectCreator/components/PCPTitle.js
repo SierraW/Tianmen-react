@@ -11,7 +11,7 @@ import { em_chat, timestamp } from '../../../../services/firebaseInit';
 import VCModal from "../../Modal/VCModal";
 import Grow from '@material-ui/core/Grow';
 import axios from "axios";
-import { NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 
 export default function ProjectCreatorPageTitle({ session, roomData, selectedUsers, removeSelectAt }) {
     const defaultHead = "url(http://tianmengroup.com/server/projectimages/blank.png)";
@@ -20,6 +20,7 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
     const [pic, setPic] = useState("");
     const [modalValuesLength, setModalValuesLength] = useState(false);
     const [isValidRoomId, setValidRoomId] = useState(false);
+    const history = useHistory();
     const initialValues = {
         expiry: false,
         name: "",
@@ -64,6 +65,7 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
                         alert("success!");
                         setloading(false);
                         setSubmitting(false);
+                        history.push("/management");
                     })
             } else {
                 em_chat.add({
@@ -78,6 +80,7 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
                         alert("success!");
                         setloading(false);
                         setSubmitting(false);
+                        history.push("/management");
                     })
             }
 
