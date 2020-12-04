@@ -1,3 +1,11 @@
+const month= ["January","February","March","April","May","June","July",
+            "August","September","October","November","December"];
+
+function formatDateMDY(dateString) {
+  var dateArr = dateString.split("-");
+  return `${month[parseInt(dateArr[1]-1)]} ${dateArr[0]}, ${dateArr[2]}`;
+}
+
 function datePrettyPrint(dt) {
   return `${dt
     .getFullYear()
@@ -31,4 +39,4 @@ function formatDate(date) {
   return [year, month, day].join('-');
 }
 
-export { datePrettyPrint, formatDate };
+export { datePrettyPrint, formatDate, formatDateMDY };
