@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import DeleteIcon from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -214,6 +214,6 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
             variant="outlined"
         />
         
-        <Button className={classes.button} onClick={() => handleDelete()}><DeleteIcon className="text-danger" /></Button>
+        <Button className={classes.button} onClick={() => handleDelete()}><CloseIcon className="text-danger" /></Button>
         </div>;
 }

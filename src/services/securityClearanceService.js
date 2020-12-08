@@ -25,9 +25,9 @@ export function userSec(user) {
     return new Promise((resolve, reject) => {
         axios.post("http://tianmengroup.com/server/socket/home/checkRole.php", { session, token })
         .then(({data}) => {
-            if (data.data.md5 === CryptoJS.SHA256(`${uid}${data.data.role_id}${token}${login}${data.data.com_id}`).toString()) {
-                const { com_id, role_id } = data.data;
-                resolve({ com_id, role_id });
+            if (data.data.md5 === CryptoJS.SHA256(`${uid}${data.data.role_id}${token}${data.data.title_id}${login}${data.data.com_id}`).toString()) {
+                const { com_id, role_id, title_id } = data.data;
+                resolve({ com_id, role_id, title_id });
             } else {
                 reject("expired");
             }
@@ -44,6 +44,18 @@ const pageAccessLevel = {
 
 export function pageSec(path, role_id) {
     if (!pageAccessLevel[path] || pageAccessLevel[path] >= role_id) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const manPageAccessLevel = {
+    "/timeline/manage": [1,6,8]
+}
+
+export function manSec(path, title_id) {
+    if (!manPageAccessLevel[path] || manPageAccessLevel[path].includes(title_id)) {
         return true;
     } else {
         return false;

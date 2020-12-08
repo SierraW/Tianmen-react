@@ -2,7 +2,7 @@ import React from "react";
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
-export default function MyVerticallyCenteredModal({ title, body, show, onHide }) {
+export default function VerticallyCenteredModal({ title, body, show, onHide }) {
     return <>
         <Modal
             show={show}

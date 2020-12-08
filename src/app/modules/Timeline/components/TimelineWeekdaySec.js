@@ -42,7 +42,6 @@ export default function TimelineWeekdaySec({ name, timeslots, specialTimeslots, 
     
     function handleDelete() {
         setSpecialTimeslot(0, name.title, null);
-        
     }
 
     return (

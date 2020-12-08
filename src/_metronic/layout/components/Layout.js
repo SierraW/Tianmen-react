@@ -9,8 +9,6 @@ import { Aside } from "./aside/Aside";
 import { Footer } from "./footer/Footer";
 import { LayoutInit } from "./LayoutInit";
 import { SubHeader } from "./subheader/SubHeader";
-import { QuickPanel } from "./extras/offcanvas/QuickPanel";
-import { QuickUser } from "./extras/offcanvas/QuickUser";
 import { ScrollTop } from "./extras/ScrollTop";
 import { StickyToolbar } from "./extras/StickyToolbar";
 import { AnimateLoading } from "../../_partials/controls";
@@ -99,8 +97,6 @@ export function Layout({ children }) {
         </div>
         {/*end::Page*/}
       </div>
-      <QuickUser />
-      <QuickPanel />
       <ScrollTop />
       <StickyToolbar />
       {/*end::Main*/}

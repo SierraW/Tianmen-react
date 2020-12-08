@@ -3,7 +3,7 @@ import Zoom from '@material-ui/core/Zoom';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import DeleteIcon from '@material-ui/icons/Delete';
+import CloseIcon from '@material-ui/icons/Close';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/core/styles';
 import { formatDate } from "../../../../services/datePrintingService";
@@ -55,22 +55,22 @@ export default function TimelineExclusiveForm({ commitExclude, initExclude }) {
         setExclude(fixedExclude);
     }, [initExclude]);
 
-    useEffect(() => {
+    function commitChanges(newExcludes) {
         var dateMap = {};
         var diw = false;
         var ucw = false;
         var tlcw = false;
-        for (var i = 0; i < excludes.length; i++) {
-            if (excludes[i].date === "") {
+        for (var i = 0; i < newExcludes.length; i++) {
+            if (newExcludes[i].date === "") {
                 ucw = true;
-            } else if (excludes[i].date <= now) {
+            } else if (newExcludes[i].date <= now) {
                 diw = true;
             }
-            if (dateMap[excludes[i].date]) {
+            if (dateMap[newExcludes[i].date]) {
                 tlcw = true;
             } else {
-                if (excludes[i].date !== "") {
-                    dateMap[excludes[i].date] = true;
+                if (newExcludes[i].date !== "") {
+                    dateMap[newExcludes[i].date] = true;
                 }
             }
         }
@@ -78,9 +78,9 @@ export default function TimelineExclusiveForm({ commitExclude, initExclude }) {
         setUcWarning(ucw);
         setTlcWarning(tlcw);
         if (!ucw && !tlcw && !diw) {
-            commitExclude(excludes);
+            commitExclude(newExcludes);
         }
-    }, [excludes]);
+    }
 
     function handleEditDetail(pos) {
         if (!excludes[pos].date || excludes[pos].date === "") {
@@ -98,6 +98,7 @@ export default function TimelineExclusiveForm({ commitExclude, initExclude }) {
         var newExcludes = [...excludes];
         newExcludes.splice(pos, 1);
         setExclude(newExcludes);
+        commitChanges(newExcludes);
     }
 
     function addExclude() {
@@ -109,6 +110,7 @@ export default function TimelineExclusiveForm({ commitExclude, initExclude }) {
         newExcludes[pos] = { ...newExcludes[pos], ...value };
         newExcludes.sort((a, b) => a.date.localeCompare(b.date));
         setExclude(newExcludes);
+        commitChanges(newExcludes);
     }
 
     return <>
@@ -162,7 +164,7 @@ export default function TimelineExclusiveForm({ commitExclude, initExclude }) {
                                         variant="outlined"
                                     />
                                     <Button className={classes.inputButton} onClick={() => handleEditDetail(index)} ><EditIcon className="text-primary" /></Button>
-                                    <Button className={classes.inputButton} onClick={() => handleDelete(index)} ><DeleteIcon className="text-danger" /></Button>
+                                    <Button className={classes.inputButton} onClick={() => handleDelete(index)} ><CloseIcon className="text-danger" /></Button>
                                 </div>
                                 {
                                     exclude.timelines.length > 0 ? (

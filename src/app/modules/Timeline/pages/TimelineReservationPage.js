@@ -1,32 +1,26 @@
 import React, { useEffect, useState } from "react";
 import Zoom from '@material-ui/core/Zoom';
 import Button from '@material-ui/core/Button';
-import { useSubheader } from "../../../../_metronic/layout";
 import { em_tl, em_timeline, em_appointment } from "../../../../services/firebaseInit";
-import { formatDate } from "../../../../services/datePrintingService";
+import { formatDateMDY, formatDate, daysInWeek, month } from "../../../../services/datePrintingService";
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import axios from 'axios';
 import { useSelector } from "react-redux";
 import TimelineReservationSuccess from "../components/TRSuccess";
-
-const daysInWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-]
+import { User, Appointment, appointmentConverter, Contact } from "../objects/Appointment";
+import TimelineReservationLimitExceeded from "../components/TRLimitExceeded";
+import { LayoutSplashScreen } from "../../../../_metronic/layout";
+import '../styles/main.css';
 
 const numberOfDaysAhead = 7;
 const all_manager_option = { user_login: false, display_name: "All Managers" };
 
 export function TimelineReservationPage() {
-    const suhbeader = useSubheader();
-    suhbeader.setTitle("Reservation");
+    const [phoneFormatWarning, setPfWarning] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [limitExceeded, setLimitExceeded] = useState(false);
     const [apSuccess, setApSuccess] = useState(false);
     const [phone, setPhone] = useState("");
     const [appointmentMade, setAppointmentMade] = useState({});
@@ -39,20 +33,46 @@ export function TimelineReservationPage() {
     const [selectedDateIndex, setSelectedDateIndex] = useState(-1);
     const [selectedItems, setSelectedItem] = useState([]);
     const [selectedTimeIndex, setSelectedTimeIndex] = useState(-1);
+    var weekArr = [];
     const dateArr = generateDatesFromNow();
     const user = useSelector((state) => state.auth.user);
+    const now = formatDate(new Date());
 
     useEffect(() => {
-        axios.post("http://tianmengroup.com/server/socket/home/getManager.php", { session: user.user_session })
-            .then(({ data }) => {
-                if (data.success === "success") {
-                    setManager([all_manager_option, ...data.data]);
-                }
+        async function onLoad() {
+            var regCount = 0;
+            axios.post("http://tianmengroup.com/server/socket/home/getManager.php", { session: user.user_session })
+                .then(({ data }) => {
+                    if (data.success === "success") {
+                        setManager([all_manager_option, ...data.data]);
+                    }
+                })
+            if (user.user_login === "Capheny") {
+                setLoading(false);
+                return true;
+            }
+            await em_appointment().where("user.login", "==", user.user_login).withConverter(appointmentConverter).get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    var appointment = doc.data();
+
+                    if (appointment.date.localeCompare(now) === 1) {
+                        regCount += 1;
+                    }
+                })
             })
+            if (regCount !== 0) {
+                setLimitExceeded(true);
+            }
+            setLoading(false);
+        }
+        onLoad();
     }, []);
 
     useEffect(() => {
-        handleSelectDay(avaliableDates.findIndex(value => value === 1));
+        const nextAVD = avaliableDates.findIndex(value => value === 1);
+        if (selectedDateIndex !== nextAVD) {
+            handleSelectDay(nextAVD);
+        }
     }, [timelines])
 
     useEffect(() => {
@@ -70,7 +90,6 @@ export function TimelineReservationPage() {
             setAvaliableDate(avDate);
             return output;
         }
-
         if (preferManager.user_login === false) {
             var unsubscribe = em_tl.onSnapshot((querySnapshot) => {
                 var result = [];
@@ -108,17 +127,21 @@ export function TimelineReservationPage() {
     }, [appointmentMade])
 
     useEffect(() => {
+        if (!preferManager) {
+            setPM(all_manager_option);
+            return;
+        }
         var unsubscribe = em_appointment(preferManager.user_login === false ? null : preferManager.user_login)
             .onSnapshot((querySnapshot) => {
                 var result = {};
                 querySnapshot.forEach((doc) => {
-                    if (!result[doc.data().advisor_login]) {
-                        result[doc.data().advisor_login] = {};
+                    if (!result[doc.data().advisor.login]) {
+                        result[doc.data().advisor.login] = {};
                     }
-                    if (!result[doc.data().advisor_login][doc.data().date]) {
-                        result[doc.data().advisor_login][doc.data().date] = {};
+                    if (!result[doc.data().advisor.login][doc.data().date]) {
+                        result[doc.data().advisor.login][doc.data().date] = {};
                     }
-                    result[doc.data().advisor_login][doc.data().date][doc.data().timeline.from] = doc.data().timeline.to;
+                    result[doc.data().advisor.login][doc.data().date][doc.data().timeline.from] = doc.data().timeline.to;
                 })
                 setAppointmentMade(result);
             })
@@ -134,6 +157,15 @@ export function TimelineReservationPage() {
             setTransTime(true);
         }
     }, [selectedItems]);
+
+    function handleSetPhone(newValue) {
+        if (!/^\+?[0-9]{8,}$/.test(newValue)) {
+            setPfWarning(true);
+        } else {
+            setPfWarning(false);
+        }
+        setPhone(newValue);
+    }
 
     function findManager(login) {
         return managers.find(mam => mam.user_login === login);
@@ -158,13 +190,17 @@ export function TimelineReservationPage() {
             if (timelines.hasOwnProperty(key)) keys.push(key);
         }
         for (var i = 0; i < keys.length; i++) {
-            timelines[keys[i]][index].forEach(timeline => {
-                resultTimeline.push({
-                    login: keys[i],
-                    date: dateArr[index],
-                    timeline
-                });
-            })
+            if (timelines[keys[i]][index]) {
+                timelines[keys[i]][index].forEach(timeline => {
+                    if (resultTimeline.findIndex((value => value.timeline.from === timeline.from && value.timeline.to === timeline.to)) === -1) {
+                        resultTimeline.push({
+                            login: keys[i],
+                            date: dateArr[index],
+                            timeline
+                        });
+                    }
+                })
+            }
         }
         resultTimeline.sort((a, b) => a.timeline.from.localeCompare(b.timeline.from));
         return resultTimeline;
@@ -172,24 +208,26 @@ export function TimelineReservationPage() {
 
     function generateDatesFromNow() {
         var days = [];
+        var weekdays = [];
         const now = new Date();
         now.setDate(now.getDate() + 1); // tomorrow!
         for (var i = 0; i < numberOfDaysAhead; i++) {
             days.push(formatDate(now));
+            weekdays.push(daysInWeek[now.getDay()])
             now.setDate(now.getDate() + 1); // tomorrow!
         }
+        weekArr = weekdays;
         return days;
     }
 
     function generateTimelineWithDates(timelineObj, avDate) {
-        const days = generateDatesFromNow();
         var result = [];
         var excludesMap = {};
         timelineObj.excludes.forEach(exclude => {
             excludesMap[exclude.date] = exclude.timelines;
         })
-        for (var i = 0; i < days.length; i++) {
-            const date = days[i];
+        for (var i = 0; i < dateArr.length; i++) {
+            const date = dateArr[i];
             const day = new Date(date);
             day.setTime(day.getTime() + day.getTimezoneOffset() * 60 * 1000);
             const weekday = daysInWeek[day.getDay()];
@@ -233,41 +271,70 @@ export function TimelineReservationPage() {
         if (selectedTimeIndex === -1) {
             return;
         }
+        if (preferMethod === "Phone") {
+            if (phoneFormatWarning) {
+                return;
+            } else if (!/^\+?[0-9]{8,}$/.test(phone)) {
+                setPfWarning(true);
+                return;
+            }
+        }
         if (checkConflict(selectedItems[selectedTimeIndex].login, dateArr[selectedDateIndex], selectedItems[selectedTimeIndex].timeline.from)) {
             return;
         }
-        const appointmentObj = {
-            advisor_email: findManager(selectedItems[selectedTimeIndex].login).user_email,
-            advisor_display_name: findManager(selectedItems[selectedTimeIndex].login).display_name,
-            advisor_login: selectedItems[selectedTimeIndex].login,
-            user_email: user.user_email,
-            user_login: user.user_login,
-            date: dateArr[selectedDateIndex],
-            contactMethod: preferMethod,
-            contact: preferMethod === "Phone" ? phone : user.user_email,
-            timeline: selectedItems[selectedTimeIndex].timeline
-        }
-        em_appointment().add(appointmentObj).then(() => {
+        // const appointmentObj = {
+        //     advisor_email: findManager(selectedItems[selectedTimeIndex].login).user_email,
+        //     advisor_display_name: findManager(selectedItems[selectedTimeIndex].login).display_name,
+        //     advisor_login: selectedItems[selectedTimeIndex].login,
+        //     user_email: user.user_email,
+        //     user_display_name: user.display_name,
+        //     user_login: user.user_login,
+        //     date: dateArr[selectedDateIndex],
+        //     contactMethod: preferMethod,
+        //     contact: preferMethod === "Phone" ? phone : user.user_email,
+        //     timeline: selectedItems[selectedTimeIndex].timeline
+        // }
+        const appointmentObj = new Appointment(
+            new User(findManager(selectedItems[selectedTimeIndex].login).user_email, selectedItems[selectedTimeIndex].login, findManager(selectedItems[selectedTimeIndex].login).display_name),
+            new User(user.user_email, user.user_login, user.display_name),
+            new Contact(preferMethod, preferMethod === "Phone" ? phone : user.user_email),
+            dateArr[selectedDateIndex],
+            selectedItems[selectedTimeIndex].timeline
+        );
+        em_appointment().withConverter(appointmentConverter).add(appointmentObj).then(() => {
             setApSuccess(appointmentObj);
         });
     }
 
-    if (apSuccess) {
-        return <TimelineReservationSuccess method={apSuccess.contactMethod} contactInfo={ apSuccess.contact } managerEmail={apSuccess.advisor_email} managerDN={apSuccess.advisor_display_name} userEmail={apSuccess.user_email} date={apSuccess.date} timeline={apSuccess.timeline} />
+    function getMonthAndDayString(date) {
+        return date.substring(5);
+    }
+
+    function getMonthAndYearString() {
+        var d = dateArr[0].split("-");
+        return `${month[parseInt(d[1]) - 1]} ${d[0]}`;
+    }
+
+    if (loading) {
+        return <LayoutSplashScreen />
+    } else if (limitExceeded) {
+        return <TimelineReservationLimitExceeded />
+    } else if (apSuccess) {
+        return <TimelineReservationSuccess method={apSuccess.contact.method} contactInfo={apSuccess.contact.content} managerEmail={apSuccess.advisor.email} managerDN={apSuccess.advisor.display_name} userDN={apSuccess.user.display_name} userEmail={apSuccess.user.email} date={apSuccess.date} timeline={apSuccess.timeline} />
     } else {
         return <>
             <div className="card card-body">
                 <h3 className="text-center">With whom and when would you like to meet?</h3>
-                <div className="mt-6 d-flex align-items-center justify-content-between">
+                <div className="mt-6 d-flex align-items-center justify-content-between hideScrollBar" style={{overflowX: "scroll"}}>
                     {
                         dateArr.map((date, index) => (
-                            <Button key={index} disabled={avaliableDates[index] === 0} className={`p-6 ${selectedDateIndex === index ? "border-6 border-primary" : ""}`} variant="outlined" onClick={() => handleSelectDay(index)}><h3 className={`${avaliableDates[index] === 0 ? "text-muted" : ""}`} style={{ margin: 0, padding: 0 }}>{date}</h3></Button>
+                            <Button key={index} disabled={avaliableDates[index] === 0} style={{minWidth: "10rem"}} className={`p-6 ${selectedDateIndex === index ? "border-6 border-primary" : ""}`} variant="outlined" onClick={() => handleSelectDay(index)}><div className="d-flex flex-column"><p>{weekArr[index]}</p><h3 className={`${avaliableDates[index] === 0 ? "text-muted" : ""}`} style={{ margin: 0, padding: 0 }}>{getMonthAndDayString(date)}</h3></div></Button>
                         ))
                     }
                 </div>
                 <div className="mt-6 d-flex align-items-end justify-content-between">
-                    <h3>December 2020</h3>
-                    <div className="d-flex align-items-end justify-content-between">
+                    <h3 id="fadeshow">{getMonthAndYearString()}</h3>
+                    <div className="d-flex align-items-end justify-content-between hideScrollBar" style={{overflowX: "scroll"}}>
                         <div className="d-flex align-items-baseline flex-column mr-6">
                             <p>Manager</p>
                             <Autocomplete
@@ -302,8 +369,8 @@ export function TimelineReservationPage() {
                 {
                     selectedItems.length > 0 ? (
                         <>
-                            <h3>Avaliable Times On {selectedItems[0].date}</h3>
-                            <div className="my-6 d-flex align-items-center">
+                            <h3>Avaliable Times On {formatDateMDY(selectedItems[0].date)}</h3>
+                            <div className="my-6 d-flex align-items-center hideScrollBar" style={{overflowX: "scroll"}}>
                                 {
                                     selectedItems.map((item, index) => (
                                         <Zoom key={index} in={transTime} style={{ transitionDelay: transTime ? `${index * 100}ms` : '0ms' }}>
@@ -318,11 +385,23 @@ export function TimelineReservationPage() {
                 {
 
                 }
-                <div className={`d-flex mt-6 flex-row-reverse ${preferMethod === "Phone" ? "justify-content-between" : ""}`}>
-                    <Button variant="outlined" size="large" color="secondary" onClick={() => commit()}>Pick Me!</Button>
+                <div className="row mt-6">
+                    <div className="col-lg-8">
                     {preferMethod === "Phone" ? (
-                        <TextField label="Your Phone Number" style={{ width: "30rem" }} required variant="outlined" type="number" value={phone} onChange={(e) => setPhone(e.target.value)}></TextField>
+                        <div className="d-flex align-items-center">
+                            <TextField label="Your Phone Number" style={{ width: "30rem" }} required variant="outlined" type="number" value={phone} onChange={(e) => handleSetPhone(e.target.value)}></TextField>
+                            {
+                                phoneFormatWarning ? (
+                                    <p className="text-danger my-0 mx-6">Your phone number is not valid.</p>
+                                ) : ""
+                            }
+                        </div>
                     ) : ""}
+                    </div>
+                    <div className="col-lg-4 d-flex align-items-end justify-content-between">
+                        <div></div>
+                        <Button variant="outlined" size="large" color="secondary" onClick={() => commit()}>Pick Me!</Button>
+                    </div>
                 </div>
             </div>
         </>;

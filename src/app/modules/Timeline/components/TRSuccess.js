@@ -1,9 +1,12 @@
 import React from "react";
-import {formatDateMDY} from "../../../../services/datePrintingService";
+import { formatDateMDY } from "../../../../services/datePrintingService";
+import { sendConfrimationEmail } from "../../../../services/emailService";
 
-export default function TimelineReservationSuccess({ method, contactInfo, managerEmail, managerDN, userEmail, date, timeline }) {
-    
+export default function TimelineReservationSuccess({ method, contactInfo, managerEmail, managerDN, userDN, userEmail, date, timeline }) {
 
+    React.useEffect(() => {
+        sendConfrimationEmail(managerDN, userDN, userEmail, formatDateMDY(date), timeline, method, contactInfo, managerEmail);
+    }, [])
 
     return <>
         <div className="card card-body">

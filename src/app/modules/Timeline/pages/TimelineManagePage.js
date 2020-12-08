@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useSubheader } from "../../../../_metronic/layout";
+import Skeleton from '@material-ui/lab/Skeleton';
 import TimelineManageForm from "../components/TimelineManageForm";
-import { LayoutSplashScreen } from "../../../../_metronic/layout";
 import { em_timeline } from "../../../../services/firebaseInit";
 import { useSelector } from "react-redux";
 
 export function TimelineManagePage() {
-    const suhbeader = useSubheader();
     const [loading, setLoading] = useState(true);
-    suhbeader.setTitle("Timeline Management");
     const [initWeekdays, setInitWeekday] = useState([]);
     const [initTimelines, setInitTimeline] = useState([]);
     const [initSpe, setInitSpe] = useState({});
@@ -35,7 +32,8 @@ export function TimelineManagePage() {
         }
 
         if (user.title_id === 1 || user.title_id === 6) {
-            em_timeline(user.user_login).set(timelineObj, { merge: true })
+            em_timeline(user.user_login).set(timelineObj)
+                .then(() => {})
                 .catch(() => {
                     alert("Network Error: failed to connect to database.")
                 })
@@ -43,15 +41,25 @@ export function TimelineManagePage() {
     }
 
 
-    if (loading) {
-        return <LayoutSplashScreen />
-    } else {
-        return <>
-            <div className="row">
-                <div className="col-lg-12 card card-body">
-                    <TimelineManageForm initWeekdays={initWeekdays} initTimelines={initTimelines} initSpe={initSpe} initExc={initExc} commitChanges={commitChanges} />
-                </div>
+    return <>
+        <div className="row">
+            <div className="col-lg-12 card card-body">
+                {
+                    loading ? (
+                        <div className="card card-body">
+                            <Skeleton animation="wave" variant="rect" height={500} />
+                            <Skeleton animation="wave" />
+                            <Skeleton animation="wave" />
+                            <Skeleton animation="wave" />
+                            <Skeleton animation="wave" />
+                            <Skeleton animation="wave" />
+                            <Skeleton animation="wave" />
+                        </div>
+                    ) : (
+                            <TimelineManageForm initWeekdays={initWeekdays} initTimelines={initTimelines} initSpe={initSpe} initExc={initExc} commitChanges={commitChanges} />
+                        )
+                }
             </div>
-        </>;
-    }
+        </div>
+    </>;
 }

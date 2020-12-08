@@ -35,7 +35,7 @@ function em_timeline(user_login) {
 
 function em_appointment(manager_login=null) {
 	if (manager_login) {
-		return em_ap.where("advisor_login" , "==", manager_login);
+		return em_ap.where("advisor.login" , "==", manager_login);
 	} else {
 		return em_ap;
 	}

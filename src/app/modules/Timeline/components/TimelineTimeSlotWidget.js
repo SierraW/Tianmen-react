@@ -22,19 +22,32 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
     const [tlcWarning, setTlcWarn] = useState(false);
     const [uncompleteWarning, setUnWarning] = useState(false);
 
-    useEffect(() => {
+    function commitChanges(newTimeslots, tlc) {
         var empty = false;
-        for (var i = 0; i < timeslots.length; i++) {
-            if (timeslots[i].from === "") {
+        var tlcWarn = false;
+        if (tlc) {
+            setTlcWarn(false);
+        } {
+            tlcWarn = checkTimeslotConflict(newTimeslots);
+            setTlcWarn(tlcWarn);
+        }
+        
+        for (var i = 0; i < newTimeslots.length; i++) {
+            if (newTimeslots[i].from === "") {
                 empty = true;
                 break;
             }
         }
         setUnWarning(empty);
-        if (!tlcWarning && !empty) {
-            setTimeline(timeslots);
+        if (!tlcWarn && !empty) {
+            setTimeline(newTimeslots);
         }
-    }, [timeslots])
+    }
+
+    function handleSetTimeslot(myTimeslots, tlc=null) {
+        setTimeslot(myTimeslots);
+        commitChanges(myTimeslots, tlc);
+    }
 
     function swap(items, leftIndex, rightIndex) {
         var temp = items[leftIndex];
@@ -103,8 +116,7 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
         if (from !== "") {
             result.push({ from, to });
         }
-        setTimeslot(result);
-        setTlcWarn(false);
+        handleSetTimeslot(result, false);
         return result;
     }
 
@@ -146,7 +158,7 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
                 from = end;
             }
         }
-        setTimeslot(result);
+        handleSetTimeslot(result);
     }
 
     function timeAddition(time, hour, min, limit) {
@@ -174,18 +186,17 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
     }
 
     function addTimeslot() {
-        setTimeslot([...timeslots, { from: "", to: "" }]);
+        handleSetTimeslot([...timeslots, { from: "", to: "" }]);
     }
     function modifyTimeslot(pos, newValue) {
         var myTimeslots = [...timeslots];
         myTimeslots[pos] = { ...myTimeslots[pos], ...newValue };
-        setTimeslot(myTimeslots);
-        setTlcWarn(checkTimeslotConflict(myTimeslots));
+        handleSetTimeslot(myTimeslots);
     }
     function handleDelete(index) {
         var myTimeslots = [...timeslots];
         myTimeslots.splice(index, 1)
-        setTimeslot(myTimeslots);
+        handleSetTimeslot(myTimeslots);
     }
 
     return <>

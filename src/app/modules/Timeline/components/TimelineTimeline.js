@@ -3,6 +3,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from '@material-ui/core/styles';
 import TimelineTimeSlotPaper from "./TimelineTimeSlotPaper";
+import '../styles/main.css';
 
 const useStyles = makeStyles(theme => ({
     drawerPaper: {
@@ -58,7 +59,7 @@ export default function TimelineTimeline({ weekdays, timelines, specialTimelines
         setCombinedTimeline(result);
     }, [weekdays, timelines, specialTimelines])
 
-    return <div className="d-flex">
+    return <div className="d-flex hideScrollBar" style={{overflowX: "scroll"}}>
         {
             combinedTimelines.map((weekday, index) => (
                 <div key={index} className="p-6">

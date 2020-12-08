@@ -48,6 +48,14 @@ export default function TimelineManageForm({ initWeekdays, initTimelines, initSp
         }
     }
 
+    function handleTimeline(value) {
+        setTimeline(value);
+    }
+
+    function handleExclude(value) {
+        setExclude(value);
+    }
+
     function checkTimeslots() {
         if (timelines.length === 0) {
             return true;
@@ -64,14 +72,14 @@ export default function TimelineManageForm({ initWeekdays, initTimelines, initSp
     return <>
         <CustomVCModal body={() => (<TimelineWeekdayForm weekdays={weekdays} timeslots={timelines} specialTimeslots={specialTimelines} setSpecialTimeslot={modifySpecialTimeline} onHide={() => setShowSp(false)} />)} show={showSp} onHide={() => setShowSp(false)} />
         <TimelineWeekdaysAutoComplete weekdays={weekdays} setWeekday={handleWeekdaysChange} />
-        <TimelineTimeSlotWidget initTimeslots={timelines} identifier={null} setTimeline={setTimeline} />
+        <TimelineTimeSlotWidget initTimeslots={timelines} identifier={null} setTimeline={handleTimeline} />
         { timelines.length > 0 ? (
             <Button variant="outlined" className={classes.button} color="primary" onClick={() => setShowSp(true)}>
                 Manage Specific Weekday
             </Button>
         ) : ""}
 
-        <TimelineExclusiveForm initExclude={initExc} commitExclude={setExclude} />
+        <TimelineExclusiveForm initExclude={initExc} commitExclude={handleExclude} />
         {
             weekdays.length > 0 && !checkTimeslots() ? (
                 <TimelineTimeline weekdays={weekdays} timelines={timelines} specialTimelines={specialTimelines} />

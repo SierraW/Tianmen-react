@@ -1,5 +1,20 @@
 [
     {
+        "version": "0.6b (BETA)",
+        "fix": [
+            "Activation code alert.",
+            "Project card photo not showing."
+        ],
+        "add": [
+            "Timeline System"
+        ],
+        "update": [
+            "Chat textarea paste image function.",
+            "Chat page message limit.",
+            "Chat page render."
+        ]
+    },
+    {
         "version": "0.5b (BETA)",
         "fix": [
             "Term and Contact pointed to wrong url."

@@ -3,7 +3,7 @@ import { useLocation, useHistory } from "react-router";
 import { NavLink } from "react-router-dom";
 import { checkIsActive } from "../../../../_helpers";
 import { useSelector } from "react-redux";
-import { userSec, pageSec } from "../../../../../services/securityClearanceService";
+import { userSec, pageSec, manSec } from "../../../../../services/securityClearanceService";
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
@@ -11,6 +11,7 @@ export function HeaderMenu({ layoutProps }) {
     const location = useLocation();
     const history = useHistory();
     const [isSuperAdmin, setSuperAdmin] = useState(false);
+    const [isManager, setManager] = useState(false);
     const getMenuItemActive = (url) => {
         return checkIsActive(location, url) ? "menu-item-active" : "";
     };
@@ -20,7 +21,7 @@ export function HeaderMenu({ layoutProps }) {
     useEffect(() => {
         userSec(user)
             .then((result) => {
-                if (!pageSec(location.pathname.split("/")[1], result.role_id)) {
+                if (!pageSec(location.pathname.split("/")[1], result.role_id) || !manSec(location.pathname, result.title_id)) {
                     MySwal.fire(<p className="text-warning">Access Denied</p>, <p>Redirecting you to main page...</p>, 'warning');
                     history.push("/dashboard")
                 }
@@ -28,6 +29,11 @@ export function HeaderMenu({ layoutProps }) {
                     setSuperAdmin(true);
                 } else {
                     setSuperAdmin(false);
+                }
+                if ((result.title_id === 1 || result.title_id === 6 || result.role_id === 8) && result.com_id === 1) {
+                    setManager(true);
+                } else {
+                    setManager(false);
                 }
             })
             .catch(() => {
@@ -71,35 +77,38 @@ export function HeaderMenu({ layoutProps }) {
                 <div className="menu-submenu menu-submenu-classic menu-submenu-left">
                     <ul className="menu-subnav">
                         <li
-                            className={`menu-item menu-item-submenu ${getMenuItemActive('/timeline/reservation')}`}
-                            data-menu-toggle="hover"
-                            aria-haspopup="true"
-                        >
-                            <NavLink className="menu-link" to="/timeline/reservation">
-                                <span className="menu-text">Reservation</span>
-                                {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
-                            </NavLink>
-                        </li>
-                        <li
-                            className={`menu-item menu-item-submenu ${getMenuItemActive('/timeline/manage')}`}
-                            data-menu-toggle="hover"
-                            aria-haspopup="true"
-                        >
-                            <NavLink className="menu-link" to="/timeline/manage">
-                                <span className="menu-text">Timeline Management</span>
-                                {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
-                            </NavLink>
-                        </li>
-                        <li
                             className={`menu-item menu-item-submenu ${getMenuItemActive('/timeline/ongoing')}`}
                             data-menu-toggle="hover"
                             aria-haspopup="true"
                         >
                             <NavLink className="menu-link" to="/timeline/ongoing">
-                                <span className="menu-text">My Reservations</span>
+                                <span className="menu-text">My Appointments</span>
                                 {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
                             </NavLink>
                         </li>
+                        <li
+                            className={`menu-item menu-item-submenu ${getMenuItemActive('/timeline/reservation')}`}
+                            data-menu-toggle="hover"
+                            aria-haspopup="true"
+                        >
+                            <NavLink className="menu-link" to="/timeline/reservation">
+                                <span className="menu-text">Make Appointment</span>
+                                {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                            </NavLink>
+                        </li>
+                        {isManager ? (
+                            <li
+                                className={`menu-item menu-item-submenu ${getMenuItemActive('/timeline/manage')}`}
+                                data-menu-toggle="hover"
+                                aria-haspopup="true"
+                            >
+                                <NavLink className="menu-link" to="/timeline/manage">
+                                    <span className="menu-text">Timeline Management</span>
+                                    {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                                </NavLink>
+                            </li>
+                        ) : ""}
+
                     </ul>
                 </div>
             </li>
