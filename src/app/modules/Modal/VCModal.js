@@ -13,7 +13,7 @@ export default function VerticallyCenteredModal({ title, body, show, onHide }) {
         >
             <Modal.Body>
                 <div className="text-center">
-                    <h1 className="my-6">{title}</h1>
+                    <h1 className="my-6 text-warning">{title}</h1>
                     <h4>{body}</h4>
                 </div>
             </Modal.Body>

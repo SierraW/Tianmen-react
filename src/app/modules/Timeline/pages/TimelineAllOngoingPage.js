@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Skeleton from '@material-ui/lab/Skeleton';
-import { Link } from "react-router-dom";
 import { em_appointment } from "../../../../services/firebaseInit";
 import { formatDate } from "../../../../services/datePrintingService";
 import { useSelector } from "react-redux";
@@ -12,42 +11,19 @@ import { sendCancelationEmail } from "../../../../services/emailService";
 import { formatDateMDY } from "../../../../services/datePrintingService";
 import TimelineOngoingAppointmentCancelForm from "../components/TOAppointmentCancelForm";
 
-export function TimelineOngoingPage() {
+export function TimelineAllOngoingPage() {
     const user = useSelector((state) => state.auth.user);
     const [showCancelForm, setShowCancelForm] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [hostedAppointments, setHostedAppointment] = useState([]);
     const [appointments, setAppointment] = useState([]);
     const [pastAppointments, setPastAppointment] = useState([]);
     const [warning, setWarning] = useState(false);
     const now = formatDate(new Date());
-    var pastMonth = function () {
-        const d = new Date();
-        d.setMonth(d.getMonth() - 1);
-        return formatDate(d);
-    }
 
     useEffect(() => {
         async function load() {
             var pastResult = [];
-            await em_appointment(user.user_login).withConverter(appointmentConverter).get().then((querySnapshot) => {
-                var result = [];
-                querySnapshot.forEach((doc) => {
-                    var appointment = doc.data();
-                    appointment = { ...appointment, id: doc.id };
-                    if (appointment.date < now) {
-                        if (appointment.date < pastMonth()) {
-                            em_appointment.doc(doc.id).delete();
-                        } else {
-                            pastResult.push(appointment);
-                        }
-                    } else {
-                        result.push(appointment);
-                    }
-                });
-                setHostedAppointment(result);
-            })
-            await em_appointment().where("user.login", "==", user.user_login).withConverter(appointmentConverter).get().then((querySnapshot) => {
+            await em_appointment().withConverter(appointmentConverter).get().then((querySnapshot) => {
                 var result = [];
                 querySnapshot.forEach((doc) => {
                     var appointment = doc.data();
@@ -82,24 +58,15 @@ export function TimelineOngoingPage() {
         if (!/^\s*$/.test(rua)) {
             reason = `, due to ${rua}`
         }
-        const loc = showCancelForm.loc;
         const docId = showCancelForm.docId;
         em_appointment().doc(docId).delete()
             .then(() => {
-                if (loc === 0) {
-                    var newApps = [...hostedAppointments];
-                } else {
-                    var newApps = [...appointments];
-                }
+                var newApps = [...appointments];
 
                 const index = newApps.findIndex((app) => app.id === docId);
                 const deletedApp = newApps.splice(index, 1)[0];
 
-                if (loc === 0) {
-                    setHostedAppointment(newApps);
-                } else {
-                    setAppointment(newApps);
-                }
+                setAppointment(newApps);
 
                 if (deletedApp) {
                     sendCancelationEmail(deletedApp.advisor.display_name, deletedApp.advisor.email, deletedApp.user.display_name, deletedApp.user.email, formatDateMDY(deletedApp.date), deletedApp.timeline, deletedApp.contact.method, deletedApp.contact.content, user.display_name, reason);
@@ -126,24 +93,16 @@ export function TimelineOngoingPage() {
             <CustomVCModal body={() => (<TimelineOngoingAppointmentCancelForm onSubmit={(rua) => handleDelete(rua)} />)} show={showCancelForm !== null} onHide={() => setShowCancelForm(null)} />
             <VerticallyCenteredModal title="Warning" body={warning ? warning : ""} show={warning !== false} onHide={() => setWarning(false)} />
             {
-                hostedAppointments.length > 0 ? (
+                appointments.length > 0 ? (
                     <div className="card card-body mb-6">
-                        <h3 className="text-center">Hosted Appointments</h3>
-                        <TimelineOngoingAppointmentTable handleDelete={(docId) => handleReqDel(0, docId)} appointments={hostedAppointments} login={user.user_login} />
+                        <h3 className="text-center">All Appointments</h3>
+                        <TimelineOngoingAppointmentTable handleDelete={(docId) => handleReqDel(1, docId)} appointments={appointments} login={user.user_login} />
                     </div>
                 ) : (
-                        appointments.length > 0 ? (
-                            <div className="card card-body mb-6">
-                                <h3 className="text-center">My Appointments</h3>
-                                <TimelineOngoingAppointmentTable handleDelete={(docId) => handleReqDel(1, docId)} appointments={appointments} login={user.user_login} />
-                            </div>
-                        ) : (
-                                <div className="card card-body">
-                                    <h3 className="text-center">My Appointments</h3>
-                                    <p className="text-center">You don't have any upcoming appointments.</p>
-                                    <Link className="text-center" to="/timeline/reservation" >Make an Appointment</Link>
-                                </div>
-                            )
+                        <div className="card card-body">
+                            <h3 className="text-center">All Appointments</h3>
+                            <p className="text-center">Can't find any upcoming appointments.</p>
+                        </div>
                     )
             }
 

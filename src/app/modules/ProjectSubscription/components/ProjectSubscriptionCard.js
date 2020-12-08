@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Button from 'react-bootstrap/Button';
+import { Link } from "react-router-dom";
 
 export default function ProjectSubscriptionCard({ className, title, subtitle, desList, pid, price }) {
 
@@ -22,10 +23,10 @@ export default function ProjectSubscriptionCard({ className, title, subtitle, de
                     </ul>
                 </div>
                 <div className="card-footer d-flex justify-content-between align-items-center">
-                    <Button variant="outline-primary" size="lg" onClick={() => subscribe()}>
+                    <Link to="/timeline/reservation"><Button variant="outline-primary" size="lg" onClick={() => subscribe()}>
                         Subscribe!
-                    </Button>
-                    <span className="text-lg-center">{ price }</span>
+                    </Button></Link>
+                    <span className="text-lg-center">{price}</span>
                 </div>
             </div>
         </div>

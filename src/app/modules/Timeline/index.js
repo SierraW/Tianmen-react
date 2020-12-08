@@ -4,6 +4,7 @@ import { ContentRoute } from "../../../_metronic/layout";
 import { TimelineManagePage } from "./pages/TimelineManagePage";
 import { TimelineReservationPage } from "./pages/TimelineReservationPage";
 import { TimelineOngoingPage } from "./pages/TimelineOngoingPage";
+import { TimelineAllOngoingPage } from "./pages/TimelineAllOngoingPage";
 
 export default function ManagementPage() {
   return (
@@ -19,6 +20,8 @@ export default function ManagementPage() {
       <ContentRoute from="/timeline/reservation" component={TimelineReservationPage} />
 
       <ContentRoute from="/timeline/ongoing" component={TimelineOngoingPage} />
+
+      <ContentRoute from="/timeline/all" component={TimelineAllOngoingPage} />
 
     </Switch>
   );

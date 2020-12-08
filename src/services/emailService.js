@@ -28,7 +28,7 @@ export function sendConfrimationEmail(managerDN, userDN, userEmail, date, timeli
     });
 }
 
-export function sendCancelationEmail(managerDN, userDN, userEmail, date, timeline, method, contactInfo, managerEmail) {
+export function sendCancelationEmail(managerDN, managerEmail, userDN, userEmail, date, timeline, method, contactInfo, can_name, can_reason) {
     emailjs.send("service_x67lyfo", "template_l3ciywl", {
         from_name: managerDN,
         to_name: userDN,
@@ -39,6 +39,22 @@ export function sendCancelationEmail(managerDN, userDN, userEmail, date, timelin
         method: method,
         contact: contactInfo,
         reply_to: managerEmail,
-        manager: managerDN
+        manager: managerDN,
+        can_name,
+        can_reason
+    });
+    emailjs.send("service_x67lyfo", "template_l3ciywl", {
+        from_name: managerDN,
+        to_name: userDN,
+        to_email: managerEmail,
+        date,
+        from: timeline.from,
+        to: timeline.to,
+        method: method,
+        contact: contactInfo,
+        reply_to: managerEmail,
+        manager: managerDN,
+        can_name,
+        can_reason
     });
 }

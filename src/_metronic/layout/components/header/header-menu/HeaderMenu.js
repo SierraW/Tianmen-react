@@ -21,7 +21,7 @@ export function HeaderMenu({ layoutProps }) {
     useEffect(() => {
         userSec(user)
             .then((result) => {
-                if (!pageSec(location.pathname.split("/")[1], result.role_id) || !manSec(location.pathname, result.title_id)) {
+                if (!pageSec(location.pathname, result.role_id) || !manSec(location.pathname, result.title_id)) {
                     MySwal.fire(<p className="text-warning">Access Denied</p>, <p>Redirecting you to main page...</p>, 'warning');
                     history.push("/dashboard")
                 }
@@ -71,7 +71,7 @@ export function HeaderMenu({ layoutProps }) {
                 aria-haspopup="true"
                 className={`menu-item menu-item-submenu menu-item-rel ${getMenuItemActive('/timeline')}`}>
                 <NavLink className="menu-link menu-toggle" to="/timeline">
-                    <span className="menu-text">Contact</span>
+                    <span className="menu-text">Appointment</span>
                     <i className="menu-arrow"></i>
                 </NavLink>
                 <div className="menu-submenu menu-submenu-classic menu-submenu-left">
@@ -92,7 +92,7 @@ export function HeaderMenu({ layoutProps }) {
                             aria-haspopup="true"
                         >
                             <NavLink className="menu-link" to="/timeline/reservation">
-                                <span className="menu-text">Make Appointment</span>
+                                <span className="menu-text">Make An Appointment</span>
                                 {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
                             </NavLink>
                         </li>
@@ -108,7 +108,20 @@ export function HeaderMenu({ layoutProps }) {
                                 </NavLink>
                             </li>
                         ) : ""}
-
+                        {
+                            isSuperAdmin ? (
+                                <li
+                                    className={`menu-item menu-item-submenu ${getMenuItemActive('/timeline/all')}`}
+                                    data-menu-toggle="hover"
+                                    aria-haspopup="true"
+                                >
+                                    <NavLink className="menu-link" to="/timeline/all">
+                                        <span className="menu-text">All Appointments</span>
+                                        {layoutProps.rootArrowEnabled && (<i className="menu-arrow" />)}
+                                    </NavLink>
+                                </li>
+                            ) : ""
+                        }
                     </ul>
                 </div>
             </li>

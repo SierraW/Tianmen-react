@@ -40,13 +40,17 @@ export function userSec(user) {
 
 const pageAccessLevel = {
     "management": 2,
+    "/timeline/all": 2
 }
 
 export function pageSec(path, role_id) {
-    if (!pageAccessLevel[path] || pageAccessLevel[path] >= role_id) {
-        return true;
-    } else {
+    var filteredPath = path.split("/");
+    if (pageAccessLevel[filteredPath[1]] && pageAccessLevel[filteredPath[1]] < role_id) {
         return false;
+    } else if (pageAccessLevel[path] && pageAccessLevel[path] < role_id) {
+        return false;
+    } else {
+        return true;
     }
 }
 

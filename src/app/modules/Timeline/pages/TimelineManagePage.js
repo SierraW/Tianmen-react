@@ -47,7 +47,7 @@ export function TimelineManagePage() {
                 {
                     loading ? (
                         <div className="card card-body">
-                            <Skeleton animation="wave" variant="rect" height={500} />
+                            <Skeleton animation="wave" variant="rect" height={200} />
                             <Skeleton animation="wave" />
                             <Skeleton animation="wave" />
                             <Skeleton animation="wave" />
