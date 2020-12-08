@@ -26,9 +26,9 @@ export function TimelineOngoingPage() {
 
     useEffect(() => {
         async function load() {
+            var pastResult = [];
             await em_appointment(user.user_login).withConverter(appointmentConverter).get().then((querySnapshot) => {
                 var result = [];
-                var pastResult = [];
                 querySnapshot.forEach((doc) => {
                     var appointment = doc.data();
                     appointment = {...appointment, id: doc.id};
@@ -43,11 +43,9 @@ export function TimelineOngoingPage() {
                     }
                 });
                 setHostedAppointment(result);
-                setPastAppointment(pastResult);
             })
             await em_appointment().where("user.login", "==", user.user_login).withConverter(appointmentConverter).get().then((querySnapshot) => {
                 var result = [];
-                var pastResult = [];
                 querySnapshot.forEach((doc) => {
                     var appointment = doc.data();
                     appointment = {...appointment, id: doc.id};
@@ -136,7 +134,7 @@ export function TimelineOngoingPage() {
 
             {
                 pastAppointments.length > 0 ? (
-                    <div className="card card-body">
+                    <div className="card card-body mt-6">
                         <h3 className="text-center">Past Appointments</h3>
                         <TimelineOngoingAppointmentTable handleDelete={(docId) => handleDelete(2, docId)} appointments={pastAppointments} login={user.user_login} />
                     </div>

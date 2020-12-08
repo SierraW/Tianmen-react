@@ -11,7 +11,7 @@ export default function ManagementPage() {
       <Redirect
         exact={true}
         from="/timeline"
-        to="/timeline/reservation"
+        to="/timeline/ongoing"
       />
 
       <ContentRoute from="/timeline/manage" component={TimelineManagePage} />
