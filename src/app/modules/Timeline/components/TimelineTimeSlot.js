@@ -140,7 +140,6 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
                     return;
                 }
                 commitValue({from: value, to});
-                return;
             }
             setFrom(value);
         } else {
@@ -152,7 +151,6 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
                     return;
                 }
                 commitValue({from, to: value});
-                return;
             } 
             setTo(value);
         }

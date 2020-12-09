@@ -122,6 +122,11 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
 
     function checkTimeslotConflict(timelines) {
         if (timelines.length < 2) {
+            if (timelines.length === 1) {
+                if(timelines[0].from !== "" && timelines[0].from === timelines[0].to) {
+                    return true;
+                }
+            }
             return false;
         }
         var sortedTimelines = quickSort([...timelines], 0, timelines.length - 1);
@@ -131,7 +136,9 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
                 timeline = sortedTimelines[i];
                 continue;
             }
-            if (compareTime(timeline.to, sortedTimelines[i].from)) {
+            if (timeline.from === timeline.to) {
+                return true;
+            } else if (compareTime(timeline.to, sortedTimelines[i].from)) {
                 return true;
             } else {
                 timeline = sortedTimelines[i];
