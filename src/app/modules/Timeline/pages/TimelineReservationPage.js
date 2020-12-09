@@ -234,7 +234,7 @@ export function TimelineReservationPage() {
             if (excludesMap[date]) {
                 result.push(excludesMap[date]);
             } else if (timelineObj.weekdays.includes(weekday)) {
-                if (timelineObj.specialTimelines[weekday]) { // TODO existed appointment check
+                if (timelineObj.specialTimelines[weekday]) {
                     result.push(timelineObj.specialTimelines[weekday]);
                 } else {
                     result.push(timelineObj.timelines);

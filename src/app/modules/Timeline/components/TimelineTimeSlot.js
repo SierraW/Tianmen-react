@@ -32,13 +32,22 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
 
     const classes = useStyles();
 
-    function handleChange(type, newValue) {
+    function superFixMachine(timeToBeFix) {
+        var time = timeToBeFix.replace(/[^0-9:]/g,'');
+        time = time.split(":");
+        if (time.length < 2) {
+            return time[0];
+        }
+        return `${time[0]}:${time[1]}`;
+    }
+
+    function handleChange(type, newValue, mandatory=false) {
         if (newValue.length > 5) {
             return;
         }
-        const oldValue = type === 0 ? from : to;
-        if (oldValue.length > newValue.length) { // delete
-            setValue(type, newValue);
+        const oldValue = type === 0 ? from : to
+        if (!mandatory && oldValue.length >= newValue.length) { // delete
+            setValue(type, superFixMachine(newValue));
         } else {
             if (newValue.split(":").length === 1) {
                 if (/^[0-2]$/.test(newValue)) {
@@ -96,13 +105,38 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
         }
     }
 
+    function completeFixMachine(time) {
+        var slice = time.split(":");
+        var hour = parseInt(slice[0]);
+        var min = parseInt(slice[1]);
+        if (isNaN(hour)) {
+            hour = "13";
+        } else if (hour > 23) {
+            hour = 23;
+        } else if ( hour < 0 ) {
+            hour = "00";
+        } else if (hour < 10) {
+            hour = `0${hour}`;
+        }
+        if (isNaN(min)) {
+            min = "00";
+        } else if (min > 59) {
+            min = 59;
+        } else if (min < 0) {
+            min = "00";
+        } else if (min < 10) {
+            min = `0${min}`;
+        }
+        return `${hour}:${min}`;
+    }
+
     function setValue(type, value, foucusOut=false) {
         if (type === 0) {
             if (foucusOut && to.length === 5 && value.length === 5) {
                 if (compareTwo(value, to)) {
                     commitValue({from: to, to: value});
-                    // setFrom(to);
-                    // setTo(value);
+                    setFrom(to);
+                    setTo(value);
                     return;
                 }
                 commitValue({from: value, to});
@@ -113,8 +147,8 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
             if (foucusOut && from.length === 5 && value.length === 5) {
                 if (compareTwo(from, value)) {
                     commitValue({from: value, to: from});
-                    // setTo(from);
-                    // setFrom(value);
+                    setTo(from);
+                    setFrom(value);
                     return;
                 }
                 commitValue({from, to: value});
@@ -124,35 +158,14 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
         }
     }
 
-    function handleValue(type) {
-        const value = type === 0 ? from : to;
+    function handleValue(type, value) {
         if (value === "") {
             return;
         }
         if (/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(value)) {
             setValue(type, value, true);
-        }
-        const valueArr = value.split(":");
-        if (valueArr.length === 1) {
-            if (/^[0-9]$/.test(value)) {
-                setValue(type, `0${value}:00`, true);
-                return;
-            }
-            setValue(type, `${value}:00`, true);
-        } else if (valueArr.length === 2) {
-            var hour = valueArr[0];
-            var sec = valueArr[1];
-            if (/^[0-9]$/.test(hour)) {
-                hour = `0${hour}`;
-            } else if (hour === "") {
-                hour = "00";
-            }
-            if (sec === "") {
-                sec = "00";
-            } else if (/^[0-9]$/.test(sec)) {
-                sec = `0${sec}`;
-            }
-            setValue(type, `${hour}:${sec}`, true);
+        } else {
+            setValue(type, completeFixMachine(value), true);
         }
     }
 
@@ -190,7 +203,7 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
             label="From"
             value={from}
             onChange={(e) => handleChange(0, e.target.value)}
-            onBlur={() => handleValue(0)}
+            onBlur={(e) => handleValue(0, e.target.value)}
             margin="normal"
             variant="outlined"
         />
@@ -200,7 +213,7 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
             label="To"
             value={to}
             onChange={(e) => handleChange(1, e.target.value)}
-            onBlur={() => handleValue(1)}
+            onBlur={(e) => handleValue(1, e.target.value)}
             margin="normal"
             variant="outlined"
         />
