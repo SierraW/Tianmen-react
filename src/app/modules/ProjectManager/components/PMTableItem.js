@@ -22,7 +22,7 @@ export default function ProjectManagerTableItem({ roomId, name, type, status, st
                 })
             }
         })
-    }, [])
+    }, [roomId]);
 
     var enterProject = function () {
         dispatch(cs.actions.setRoom(roomId));
@@ -52,7 +52,7 @@ export default function ProjectManagerTableItem({ roomId, name, type, status, st
                         </span>
                     </div>
                     <div>
-                        <a href="#" className="text-dark-75 font-weight-bolder text-hover-primary mb-1 font-size-lg">{name}</a>
+                        <span className="text-dark-75 font-weight-bolder text-hover-primary mb-1 font-size-lg">{name}</span>
                         <span className="text-muted font-weight-bold d-block">{type}</span>
                     </div>
                 </div>

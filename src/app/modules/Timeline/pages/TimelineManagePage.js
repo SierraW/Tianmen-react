@@ -23,7 +23,7 @@ export function TimelineManagePage() {
             }
             setLoading(false);
         });
-    }, [])
+    }, [user.user_login]);
 
     function commitChanges(timelineObj) {
         if (firstTime) {

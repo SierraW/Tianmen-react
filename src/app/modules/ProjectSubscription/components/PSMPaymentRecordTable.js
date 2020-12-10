@@ -120,7 +120,7 @@ export default function ProjectSubscriptionManagementPaymentRecordTable({ pid })
         return function cleanup() {
             unsubscribe();
         };
-    }, [])
+    }, [pid]);
 
     function handleChangePage(event, newPage) {
         setPage(newPage);

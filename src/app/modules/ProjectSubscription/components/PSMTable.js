@@ -154,22 +154,20 @@ export default function ProjectSubscriptionManageTable({ className }) {
                                                     <SettingsIcon />
                                                 </span>
                                             </button>
-                                            <a
-                                                href="#"
+                                            <span
                                                 className="btn btn-icon btn-light btn-hover-primary btn-sm mx-3"
                                             >
                                                 <span className="svg-icon svg-icon-md svg-icon-primary">
                                                     <CreateIcon />
                                                 </span>
-                                            </a>
-                                            <a
-                                                href="#"
+                                            </span>
+                                            <span
                                                 className="btn btn-icon btn-light btn-hover-primary btn-sm"
                                             >
                                                 <span className="svg-icon svg-icon-md svg-icon-primary">
                                                     <DeleteIcon />
                                                 </span>
-                                            </a>
+                                            </span>
                                         </td>
                                     </tr>
                                 ))}

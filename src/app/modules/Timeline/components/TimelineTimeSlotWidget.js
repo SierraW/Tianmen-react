@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import TimelineTimeSlot from "./TimelineTimeSlot";
 import TimelineDurationField from "./TimelineDurationField";
 import Button from '@material-ui/core/Button';
@@ -27,7 +27,7 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
         var tlcWarn = false;
         if (tlc) {
             setTlcWarn(false);
-        } {
+        } else {
             tlcWarn = checkTimeslotConflict(newTimeslots);
             setTlcWarn(tlcWarn);
         }
@@ -186,7 +186,7 @@ export default function TiemlineTimeSlotWidget({initTimeslots, setTimeline}) {
         }
         const lhsArr = lhs.split(":");
         const rhsArr = rhs.split(":");
-        if (lhsArr[0] > rhsArr[0] || lhsArr[0] === rhsArr[0] && lhsArr[1] > rhsArr[1]) {
+        if (lhsArr[0] > rhsArr[0] || (lhsArr[0] === rhsArr[0] && lhsArr[1] > rhsArr[1])) {
             return true;
         }
         return false;

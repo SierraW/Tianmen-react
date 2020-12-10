@@ -53,7 +53,7 @@ export default function TimelineExclusiveForm({ commitExclude, initExclude }) {
             }
         }
         setExclude(fixedExclude);
-    }, [initExclude]);
+    }, [initExclude, now]);
 
     function commitChanges(newExcludes) {
         var dateMap = {};

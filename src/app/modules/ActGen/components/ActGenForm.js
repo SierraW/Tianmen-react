@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Paper from '@material-ui/core/Paper';
@@ -57,7 +57,7 @@ export default function ActGenForm() {
         axios.post("http://tianmengroup.com/server/socket/user/generateActCode.php", formData)
             .then(({ data }) => {
                 var items = data.data;
-                if (items.length == 0) {
+                if (items.length === 0) {
                     throw new Error(data.message);
                 }
                 setActCode(items);

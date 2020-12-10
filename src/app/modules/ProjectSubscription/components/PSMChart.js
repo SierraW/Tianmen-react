@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ApexCharts from 'react-apexcharts';
 import PropTypes from "prop-types";
 import { em_payment, em_room } from "../../../../services/firebaseInit";
@@ -47,8 +47,18 @@ export default function ProjectSubscriptionManagementChart({ pid, setBillGates }
         },
     }
     const [name, setName] = useState("");
-    const [labels, setLabel] = useState([])
-    const [series, setSeries] = useState([])
+    const [labels, setLabel] = useState([]);
+    const [series, setSeries] = useState([]);
+    const cbNextBillDate = useCallback(() => {
+        if (labels.length === 0) {
+            return null;
+        } else {
+            var date = new Date(labels[0]);
+            date.setMonth(date.getMonth() + 1);
+            date.setDate(date.getDate() + 1);
+            return formatDate(date);
+        }
+    }, [labels]);
 
     useEffect(() => {
         em_room(pid).get().then((doc) => {
@@ -68,25 +78,14 @@ export default function ProjectSubscriptionManagementChart({ pid, setBillGates }
         return function cleanup() {
             unsubscribe();
         };
-    }, [])
+    }, [pid]);
 
     useEffect(() => {
-        const nextBillGates = getNextBillDate();
+        const nextBillGates = cbNextBillDate();
         if (nextBillGates) {
             setBillGates(nextBillGates);
         }
-    }, [labels])
-
-    function getNextBillDate() {
-        if (labels.length === 0) {
-            return null;
-        } else {
-            var date = new Date(labels[0]);
-            date.setMonth(date.getMonth() + 1);
-            date.setDate(date.getDate() + 1);
-            return formatDate(date);
-        }
-    }
+    }, [labels, cbNextBillDate, setBillGates]);
 
     return <>
         <ApexCharts options={{ ...basicOptions, labels }} series={[{ name, data: series }]} type="area" height={350} />

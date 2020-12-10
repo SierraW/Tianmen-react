@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useSubheader } from "../../../../_metronic/layout";
 import { LayoutSplashScreen } from "../../../../_metronic/layout";
 import { useSelector } from "react-redux";
@@ -12,7 +12,6 @@ export const CustomerSupportPage = () => {
     const [attendees, setAttendee] = useState([]);
     const [roomName, setRoomName] = useState("");
     const [userInfo, setUserInfo] = useState({});
-    var updateUserInfoArr = [];
 
     suhbeader.setTitle("Support");
 
@@ -20,9 +19,37 @@ export const CustomerSupportPage = () => {
     const uid = useSelector((state) => state.auth.user.id);
     const session = useSelector((state) => state.auth.user_session);
 
+    const cbAttendeeData = useCallback((attendees) => {
+        var updateUserInfoArr = [];
+        attendees.forEach(aid => {
+            if (!userInfo[aid]) {
+                updateUserInfoArr.push(aid);
+            }
+        })
+        if (updateUserInfoArr.length > 0) {
+            axios.get(`http://tianmengroup.com/server/socket/getDisplayName.php?uid=${JSON.stringify(updateUserInfoArr)}&multiple=true`)
+                .then(({ data }) => {
+                    var newUserInfos = [];
+                    data.data.forEach(uInfo => {
+                        newUserInfos[uInfo.id] = {
+                            name: uInfo.display_name,
+                            title: uInfo.title_name,
+                            head: uInfo.head,
+                            company: uInfo.company_name,
+                            com_id: uInfo.com_id
+                        }
+                    })
+                    setUserInfo({
+                        ...userInfo, ...newUserInfos
+                    });
+                })
+        }
+    }, [userInfo]);
+
     useEffect(() => {
         enableLoading();
         var unsubscribe = em_room(id).onSnapshot(doc => {
+            cbAttendeeData(doc.data().attendees);
             setAttendee(doc.data().attendees);
             setRoomName(doc.data().name)
         })
@@ -32,33 +59,7 @@ export const CustomerSupportPage = () => {
         return function cleanup() {
             unsubscribe();
         };
-    }, [])
-
-    useEffect(() => {
-        attendees.forEach(aid => {
-            if (!userInfo[aid]) {
-                updateUserInfoArr.push(aid);
-            }
-        })
-
-        axios.get(`http://tianmengroup.com/server/socket/getDisplayName.php?uid=${JSON.stringify(updateUserInfoArr)}&multiple=true`)
-            .then(({ data }) => {
-                var newUserInfos = [];
-                data.data.forEach(uInfo => {
-                    newUserInfos[uInfo.id] = {
-                        name: uInfo.display_name,
-                        title: uInfo.title_name,
-                        head: uInfo.head,
-                        company: uInfo.company_name,
-                        com_id: uInfo.com_id
-                    }
-                })
-                setUserInfo({
-                    ...userInfo, ...newUserInfos
-                });
-            })
-        updateUserInfoArr = [];
-    }, [attendees]);
+    }, [cbAttendeeData, id]);
 
     const enableLoading = () => {
         setLoading(true);

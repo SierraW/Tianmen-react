@@ -32,7 +32,7 @@ export default function TimelineManageForm({ initWeekdays, initTimelines, initSp
             specialTimelines,
             excludes
         });
-    }, [weekdays, timelines, specialTimelines, excludes]);
+    }, [weekdays, timelines, specialTimelines, excludes, commitChanges]);
 
     function handleWeekdaysChange(newWeekday) {
         setWeekday(newWeekday);

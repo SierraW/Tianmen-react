@@ -6,7 +6,7 @@ export default function TimelineReservationSuccess({ method, contactInfo, manage
 
     React.useEffect(() => {
         sendConfrimationEmail(managerDN, userDN, userEmail, formatDateMDY(date), timeline, method, contactInfo, managerEmail);
-    }, [])
+    }, [contactInfo, date, managerDN, managerEmail, method, timeline, userDN, userEmail]);
 
     return <>
         <div className="card card-body">

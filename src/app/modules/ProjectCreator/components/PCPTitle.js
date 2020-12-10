@@ -26,21 +26,6 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
         name: "",
         type: "",
     }
-
-    useEffect(() => {
-        em_chat.doc(roomData.id).get().then((doc) => {
-            if (doc.exists) {
-                setValidRoomId(true);
-                setPic(roomData.head);
-                formik.setValues({
-                    expiry: roomData.expiry,
-                    name: roomData.name,
-                    type: roomData.type
-                });
-            }
-        })
-    }, [roomData])
-
     const submit = (values, setStatus, setSubmitting) => {
         if (selectedUsers.length < 2) {
             setModalValuesLength(true);
@@ -161,9 +146,21 @@ export default function ProjectCreatorPageTitle({ session, roomData, selectedUse
                     setLoadingImg(false);
                 });
         }, 1000)
-
-
     }
+
+    useEffect(() => {
+        em_chat.doc(roomData.id).get().then((doc) => {
+            if (doc.exists) {
+                setValidRoomId(true);
+                setPic(roomData.head);
+                formik.setValues({
+                    expiry: roomData.expiry,
+                    name: roomData.name,
+                    type: roomData.type
+                });
+            }
+        })
+    }, [roomData, formik])
 
     return <>
         <VCModal title="Not Enough Members" body="You must have at leats two members in a project." show={modalValuesLength} onHide={() => setModalValuesLength(false)} />

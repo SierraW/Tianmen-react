@@ -55,7 +55,7 @@ export const ProjectCreatorPage = ({ match }) => {
         delay(time.long).then(() => {
             setLoading(false);
         });
-    }, [])
+    }, [user.user_session, match.params.id]);
 
     useEffect(() => {
         setUsers(users.map(user => {
@@ -65,7 +65,7 @@ export const ProjectCreatorPage = ({ match }) => {
                 return user;
             }
         }));
-    }, [roomData])
+    }, [roomData, users]);
 
     useEffect(() => {
         setSelectedUsers(users.filter(user => user.isSelected));

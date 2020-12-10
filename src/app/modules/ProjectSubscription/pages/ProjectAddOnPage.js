@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSubheader } from "../../../../_metronic/layout";
 import { LayoutSplashScreen } from "../../../../_metronic/layout";
-import { useSelector } from "react-redux";
 import ProjectSubscriptionCard from "../components/ProjectSubscriptionCard";
 import { delay } from "../../../../services/delayLoading";
 import { em_addOn } from "../../../../services/firebaseInit";
@@ -11,7 +10,6 @@ export const ProjectAddOnPage = () => {
     suhbeader.setTitle("Projects Overview");
     const [loading, setLoading] = useState(true);
     const [psCards, setPSCard] = useState([]);
-    const uid = useSelector((state) => state.auth.user.id);
 
     useEffect(() => {
         em_addOn.where("available", "==", true).get().then((querySnapshot) => {

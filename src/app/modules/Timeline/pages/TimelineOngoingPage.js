@@ -64,7 +64,7 @@ export function TimelineOngoingPage() {
             setLoading(false);
         }
         load();
-    }, []);
+    }, [now, user.user_login]);
 
     function handleReqDel(loc, docId) {
         if (loc === 2) {
@@ -86,10 +86,9 @@ export function TimelineOngoingPage() {
         const docId = showCancelForm.docId;
         em_appointment().doc(docId).delete()
             .then(() => {
+                var newApps = [...appointments];
                 if (loc === 0) {
-                    var newApps = [...hostedAppointments];
-                } else {
-                    var newApps = [...appointments];
+                    newApps = [...hostedAppointments];
                 }
 
                 const index = newApps.findIndex((app) => app.id === docId);

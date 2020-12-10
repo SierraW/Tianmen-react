@@ -78,7 +78,7 @@ export const ProjectSubscriptionManagerPage = ({ match, history }) => {
         checkDoc();
 
         delay().then(setLoading(false));
-    }, [])
+    }, [match.params.id, history]);
 
     function handleSubmit(e) {
         e.preventDefault();

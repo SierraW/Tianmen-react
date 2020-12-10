@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import { useSubheader } from "../../../../_metronic/layout";
 import VersionCard from "../components/VersionCard";
 import jsonData from '../data/versionData.json';

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import Zoom from '@material-ui/core/Zoom';
 import Button from '@material-ui/core/Button';
 import { em_tl, em_timeline, em_appointment } from "../../../../services/firebaseInit";
@@ -38,10 +38,109 @@ export function TimelineReservationPage() {
     const user = useSelector((state) => state.auth.user);
     const now = formatDate(new Date());
 
+    const cbGetMatchedTimeline = useCallback((index) => {
+        var resultTimeline = [];
+        let keys = [];
+        for (let key in timelines) {
+            if (timelines.hasOwnProperty(key)) keys.push(key);
+        }
+        for (var i = 0; i < keys.length; i++) {
+            const timelineAtKeyAndDay = timelines[keys[i]][index];
+            if (timelineAtKeyAndDay) {
+                for (var j = 0; j < timelineAtKeyAndDay.length; j++) {
+                    const timeline = timelineAtKeyAndDay[j];
+                    if (resultTimeline.findIndex((value => value.timeline.from === timeline.from && value.timeline.to === timeline.to)) === -1) {
+                        resultTimeline.push({
+                            login: keys[i],
+                            date: dateArr[index],
+                            timeline
+                        });
+                    }
+                }
+            }
+        }
+        resultTimeline.sort((a, b) => a.timeline.from.localeCompare(b.timeline.from));
+        return resultTimeline;
+    }, [dateArr, timelines]);
+    const cbHandleSelectDay = useCallback((index) => {
+        setTransTime(false);
+        setSelectedDateIndex(index);
+        if (selectedItems.length > 0) {
+            setTimeout(() => {
+                setSelectedItem(cbGetMatchedTimeline(index));
+            }, 200)
+        } else {
+            setSelectedItem(cbGetMatchedTimeline(index));
+        }
+    }, [cbGetMatchedTimeline, selectedItems.length]);
+    const cbCheckConfig = useCallback((login, date, from) => {
+        if (appointmentMade[login]) {
+            if (appointmentMade[login][date]) {
+                if (appointmentMade[login][date][from]) {
+                    return true
+                }
+            }
+        }
+        return false;
+    }, [appointmentMade]);
+    const cbGenerateTimeline = useCallback((mtls) => {
+        var output = {};
+        var avDate = [];
+        for (var i = 0; i < numberOfDaysAhead; i++) {
+            avDate.push(0);
+        }
+        mtls.forEach((timelineObj) => {
+            var result = [];
+            var excludesMap = {};
+            timelineObj.excludes.forEach(exclude => {
+                excludesMap[exclude.date] = exclude.timelines;
+            })
+            for (var i = 0; i < dateArr.length; i++) {
+                const date = dateArr[i];
+                const day = new Date(date);
+                day.setTime(day.getTime() + day.getTimezoneOffset() * 60 * 1000);
+                const weekday = daysInWeek[day.getDay()];
+                if (excludesMap[date]) {
+                    result.push(excludesMap[date]);
+                } else if (timelineObj.weekdays.includes(weekday)) {
+                    if (timelineObj.specialTimelines[weekday]) {
+                        result.push(timelineObj.specialTimelines[weekday]);
+                    } else {
+                        result.push(timelineObj.timelines);
+                    }
+                } else {
+                    result.push([]);
+                }
+                if (result[i].length > 0) {
+                    var fullyBooked = true;
+                    for (var j = 0; j < result[i].length; j++) {
+                        if (!cbCheckConfig(timelineObj.uid, date, result[i][j].from)) {
+                            fullyBooked = false;
+                            break;
+                        }
+                    }
+                    avDate[i] = fullyBooked ? 0 : 1;
+                }
+            }
+            output[timelineObj.uid] = result;
+        })
+        setAvaliableDate(avDate);
+        return output;
+
+
+    }, [cbCheckConfig, dateArr]);
+    const cbAutoSelect = useCallback(() => {
+        console.log("unexpected auto selecte");
+        const nextAVD = avaliableDates.findIndex(value => value === 1);
+        if (selectedDateIndex !== nextAVD) {
+            cbHandleSelectDay(nextAVD);
+        }
+    }, [cbHandleSelectDay, selectedDateIndex, avaliableDates]);
+
     useEffect(() => {
         async function onLoad() {
             var regCount = 0;
-            axios.post("http://tianmengroup.com/server/socket/home/getManager.php", { session: user.user_session })
+            await axios.post("http://tianmengroup.com/server/socket/home/getManager.php", { session: user.user_session })
                 .then(({ data }) => {
                     if (data.success === "success") {
                         setManager([all_manager_option, ...data.data]);
@@ -66,33 +165,17 @@ export function TimelineReservationPage() {
             setLoading(false);
         }
         onLoad();
-    }, []);
+    }, [now, user.user_login, user.user_session]);
 
     useEffect(() => {
-        const nextAVD = avaliableDates.findIndex(value => value === 1);
-        if (selectedDateIndex !== nextAVD) {
-            handleSelectDay(nextAVD);
+        var db = em_tl;
+        if (preferManager.user_login !== false) {
+            db = em_timeline(preferManager.user_login);
         }
-    }, [timelines])
-
-    useEffect(() => {
-        function handleOutput(result) {
+        var unsubscribe = db.onSnapshot((querySnapshot) => {
+            var result = [];
             var output = {};
-            var avDate = [];
-            for (var i = 0; i < numberOfDaysAhead; i++) {
-                avDate.push(0);
-            }
-            result.forEach((timelineObj) => {
-                const result = generateTimelineWithDates(timelineObj, avDate);
-                output[timelineObj.uid] = result[0];
-                avDate = result[1];
-            })
-            setAvaliableDate(avDate);
-            return output;
-        }
-        if (preferManager.user_login === false) {
-            var unsubscribe = em_tl.onSnapshot((querySnapshot) => {
-                var result = [];
+            if (preferManager.user_login === false) {
                 querySnapshot.forEach((doc) => {
                     result.push({
                         uid: doc.id,
@@ -102,12 +185,10 @@ export function TimelineReservationPage() {
                         excludes: doc.data().excludes
                     })
                 })
-                setTimeline(handleOutput(result));
-            })
-        } else {
-            var unsubscribe = em_timeline(preferManager.user_login).onSnapshot((doc) => {
+                output = cbGenerateTimeline(result);
+            } else {
                 setAvaliableDate([]);
-                var result = [];
+                var doc = querySnapshot;
                 if (doc.exists) {
                     result.push({
                         uid: doc.id,
@@ -117,14 +198,16 @@ export function TimelineReservationPage() {
                         excludes: doc.data().excludes
                     })
                 }
-                setTimeline(handleOutput(result));
-            })
-        }
+                output = cbGenerateTimeline(result);
+            }
+            console.log("unexpected reload");
+            setTimeline(output);
+        });
 
         return function cleanup() {
             unsubscribe();
         };
-    }, [appointmentMade])
+    }, [preferManager.user_login, cbGenerateTimeline])
 
     useEffect(() => {
         if (!preferManager) {
@@ -158,6 +241,12 @@ export function TimelineReservationPage() {
         }
     }, [selectedItems]);
 
+    useEffect(() => {
+        if (Object.keys(timelines).length !== 0 && avaliableDates.length === 7) {
+            cbAutoSelect();
+        }
+    }, [timelines, avaliableDates, cbAutoSelect])
+
     function handleSetPhone(newValue) {
         if (!/^\+?[0-9]{8,}$/.test(newValue)) {
             setPfWarning(true);
@@ -169,41 +258,6 @@ export function TimelineReservationPage() {
 
     function findManager(login) {
         return managers.find(mam => mam.user_login === login);
-    }
-
-    function handleSelectDay(index) {
-        setTransTime(false);
-        setSelectedDateIndex(index);
-        if (selectedItems.length > 0) {
-            setTimeout(() => {
-                setSelectedItem(getAllMatchedTimeline(index));
-            }, 200)
-        } else {
-            setSelectedItem(getAllMatchedTimeline(index));
-        }
-    }
-
-    function getAllMatchedTimeline(index) {
-        var resultTimeline = [];
-        let keys = [];
-        for (let key in timelines) {
-            if (timelines.hasOwnProperty(key)) keys.push(key);
-        }
-        for (var i = 0; i < keys.length; i++) {
-            if (timelines[keys[i]][index]) {
-                timelines[keys[i]][index].forEach(timeline => {
-                    if (resultTimeline.findIndex((value => value.timeline.from === timeline.from && value.timeline.to === timeline.to)) === -1) {
-                        resultTimeline.push({
-                            login: keys[i],
-                            date: dateArr[index],
-                            timeline
-                        });
-                    }
-                })
-            }
-        }
-        resultTimeline.sort((a, b) => a.timeline.from.localeCompare(b.timeline.from));
-        return resultTimeline;
     }
 
     function generateDatesFromNow() {
@@ -220,53 +274,6 @@ export function TimelineReservationPage() {
         return days;
     }
 
-    function generateTimelineWithDates(timelineObj, avDate) {
-        var result = [];
-        var excludesMap = {};
-        timelineObj.excludes.forEach(exclude => {
-            excludesMap[exclude.date] = exclude.timelines;
-        })
-        for (var i = 0; i < dateArr.length; i++) {
-            const date = dateArr[i];
-            const day = new Date(date);
-            day.setTime(day.getTime() + day.getTimezoneOffset() * 60 * 1000);
-            const weekday = daysInWeek[day.getDay()];
-            if (excludesMap[date]) {
-                result.push(excludesMap[date]);
-            } else if (timelineObj.weekdays.includes(weekday)) {
-                if (timelineObj.specialTimelines[weekday]) {
-                    result.push(timelineObj.specialTimelines[weekday]);
-                } else {
-                    result.push(timelineObj.timelines);
-                }
-            } else {
-                result.push([]);
-            }
-            if (result[i].length > 0) {
-                var fullyBooked = true;
-                for (var j = 0; j < result[i].length; j++) {
-                    if (!checkConflict(timelineObj.uid, date, result[i][j].from)) {
-                        fullyBooked = false;
-                        break;
-                    }
-                }
-                avDate[i] = fullyBooked ? 0 : 1;
-            }
-        }
-        return [result, avDate];
-    }
-
-    function checkConflict(login, date, from) {
-        if (appointmentMade[login]) {
-            if (appointmentMade[login][date]) {
-                if (appointmentMade[login][date][from]) {
-                    return true
-                }
-            }
-        }
-        return false;
-    }
-
     function commit() {
         if (selectedTimeIndex === -1) {
             return;
@@ -279,21 +286,9 @@ export function TimelineReservationPage() {
                 return;
             }
         }
-        if (checkConflict(selectedItems[selectedTimeIndex].login, dateArr[selectedDateIndex], selectedItems[selectedTimeIndex].timeline.from)) {
+        if (cbCheckConfig(selectedItems[selectedTimeIndex].login, dateArr[selectedDateIndex], selectedItems[selectedTimeIndex].timeline.from)) {
             return;
         }
-        // const appointmentObj = {
-        //     advisor_email: findManager(selectedItems[selectedTimeIndex].login).user_email,
-        //     advisor_display_name: findManager(selectedItems[selectedTimeIndex].login).display_name,
-        //     advisor_login: selectedItems[selectedTimeIndex].login,
-        //     user_email: user.user_email,
-        //     user_display_name: user.display_name,
-        //     user_login: user.user_login,
-        //     date: dateArr[selectedDateIndex],
-        //     contactMethod: preferMethod,
-        //     contact: preferMethod === "Phone" ? phone : user.user_email,
-        //     timeline: selectedItems[selectedTimeIndex].timeline
-        // }
         const appointmentObj = new Appointment(
             new User(findManager(selectedItems[selectedTimeIndex].login).user_email, selectedItems[selectedTimeIndex].login, findManager(selectedItems[selectedTimeIndex].login).display_name),
             new User(user.user_email, user.user_login, user.display_name),
@@ -325,16 +320,16 @@ export function TimelineReservationPage() {
         return <>
             <div className="card card-body">
                 <h3 className="text-center">With whom and when would you like to meet?</h3>
-                <div className="mt-6 d-flex align-items-center justify-content-between hideScrollBar" style={{overflowX: "scroll"}}>
+                <div className="mt-6 d-flex align-items-center justify-content-between hideScrollBar" style={{ overflowX: "scroll" }}>
                     {
                         dateArr.map((date, index) => (
-                            <Button key={index} disabled={avaliableDates[index] === 0} style={{minWidth: "10rem"}} className={`p-6 ${selectedDateIndex === index ? "border-6 border-primary" : ""}`} variant="outlined" onClick={() => handleSelectDay(index)}><div className="d-flex flex-column"><p>{weekArr[index]}</p><h3 className={`${avaliableDates[index] === 0 ? "text-muted" : ""}`} style={{ margin: 0, padding: 0 }}>{getMonthAndDayString(date)}</h3></div></Button>
+                            <Button key={index} disabled={avaliableDates[index] === 0} style={{ minWidth: "10rem" }} className={`p-6 ${selectedDateIndex === index ? "border-6 border-primary" : ""}`} variant="outlined" onClick={() => cbHandleSelectDay(index)}><div className="d-flex flex-column"><p>{weekArr[index]}</p><h3 className={`${avaliableDates[index] === 0 ? "text-muted" : ""}`} style={{ margin: 0, padding: 0 }}>{getMonthAndDayString(date)}</h3></div></Button>
                         ))
                     }
                 </div>
                 <div className="mt-6 d-flex align-items-end justify-content-between">
                     <h3 id="fadeshow">{getMonthAndYearString()}</h3>
-                    <div className="d-flex align-items-end justify-content-between hideScrollBar" style={{overflowX: "scroll"}}>
+                    <div className="d-flex align-items-end justify-content-between hideScrollBar" style={{ overflowX: "scroll" }}>
                         <div className="d-flex align-items-baseline flex-column mr-6">
                             <p>Manager</p>
                             <Autocomplete
@@ -370,11 +365,11 @@ export function TimelineReservationPage() {
                     selectedItems.length > 0 ? (
                         <>
                             <h3>Avaliable Times On {formatDateMDY(selectedItems[0].date)}</h3>
-                            <div className="my-6 d-flex align-items-center hideScrollBar" style={{overflowX: "scroll"}}>
+                            <div className="my-6 d-flex align-items-center hideScrollBar" style={{ overflowX: "scroll" }}>
                                 {
                                     selectedItems.map((item, index) => (
                                         <Zoom key={index} in={transTime} style={{ transitionDelay: transTime ? `${index * 100}ms` : '0ms' }}>
-                                            <Button className={`p-3 mx-3 ${selectedTimeIndex === index ? "bg-primary text-white" : ""} ${checkConflict(item.login, dateArr[selectedDateIndex], item.timeline.from) ? "text-muted" : ""}`} disabled={checkConflict(item.login, dateArr[selectedDateIndex], item.timeline.from)} variant="outlined" onClick={() => setSelectedTimeIndex(index)}><p style={{ margin: 0, padding: 0 }}>FROM {item.timeline.from} To {item.timeline.to}</p></Button>
+                                            <Button className={`p-3 mx-3 ${selectedTimeIndex === index ? "bg-primary text-white" : ""} ${cbCheckConfig(item.login, dateArr[selectedDateIndex], item.timeline.from) ? "text-muted" : ""}`} disabled={cbCheckConfig(item.login, dateArr[selectedDateIndex], item.timeline.from)} variant="outlined" onClick={() => setSelectedTimeIndex(index)}><p style={{ margin: 0, padding: 0 }}>FROM {item.timeline.from} To {item.timeline.to}</p></Button>
                                         </Zoom>
                                     ))
                                 }
@@ -387,16 +382,16 @@ export function TimelineReservationPage() {
                 }
                 <div className="row mt-6">
                     <div className="col-lg-8">
-                    {preferMethod === "Phone" ? (
-                        <div className="d-flex align-items-center">
-                            <TextField label="Your Phone Number" style={{ width: "30rem" }} required variant="outlined" type="number" value={phone} onChange={(e) => handleSetPhone(e.target.value)}></TextField>
-                            {
-                                phoneFormatWarning ? (
-                                    <p className="text-danger my-0 mx-6">Your phone number is not valid.</p>
-                                ) : ""
-                            }
-                        </div>
-                    ) : ""}
+                        {preferMethod === "Phone" ? (
+                            <div className="d-flex align-items-center">
+                                <TextField label="Your Phone Number" style={{ width: "30rem" }} required variant="outlined" type="number" value={phone} onChange={(e) => handleSetPhone(e.target.value)}></TextField>
+                                {
+                                    phoneFormatWarning ? (
+                                        <p className="text-danger my-0 mx-6">Your phone number is not valid.</p>
+                                    ) : ""
+                                }
+                            </div>
+                        ) : ""}
                     </div>
                     <div className="col-lg-4 d-flex align-items-end justify-content-between">
                         <div></div>

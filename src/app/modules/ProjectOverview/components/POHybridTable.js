@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PersonAddIcon from '@material-ui/icons/PersonAdd';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SettingsIcon from '@material-ui/icons/Settings';
@@ -22,10 +22,17 @@ export default function ProjectOverviewHybridTable({ className, type }) {
     const [itemData, setItemData] = useState(initValue);
     const [items, setItems] = useState([]);
     const user = useSelector((state) => state.auth.user);
+    const cbUpdate = useCallback(() => {
+        if (type === 0) {
+            getNews().then(data => setItems(data));
+        } else {
+            getNaughtys().then(data => setItems(data));
+        }
+    }, [type])
 
     useEffect(() => {
-        updateContent();
-    }, [showInputModal])
+        cbUpdate();
+    }, [showInputModal, cbUpdate])
 
     function updateContent() {
         if (type === 0) {

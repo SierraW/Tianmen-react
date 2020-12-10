@@ -35,7 +35,7 @@ export const MyProjectsPage = () => {
     return function cleanup() {
       unsubscribe();
     };
-  }, [])
+  }, [uid]);
 
   const emptyCard = () => {
     return (

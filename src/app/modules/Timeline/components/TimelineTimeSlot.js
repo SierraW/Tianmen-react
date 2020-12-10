@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import CloseIcon from '@material-ui/icons/Close';
@@ -20,15 +20,29 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
     const [from, setFrom] = useState(initFrom);
     const [to, setTo] = useState(initTo);
     const [diff, setDiff] = useState("");
+    const cbCompare = useCallback((lhs, rhs) => {
+        if (lhs === "" || rhs === "") {
+            setDiff("0 hours and 0 minutes");
+            return false;
+        }
+        const lhsMin = lhs.slice(0,2), lhsSec = lhs.slice(-2);
+        const rhsMin = rhs.slice(0,2), rhsSec = rhs.slice(-2);
+        
+        if (lhsMin > rhsMin || (lhsMin === rhsMin && lhsSec > rhsSec)) {
+            calDiff(lhsMin, lhsSec, rhsMin, rhsSec);
+            return true;
+        }
+        calDiff(rhsMin, rhsSec, lhsMin, lhsSec);
+        return false;
+    }, [])
 
     useEffect(() => {
         setFrom(initFrom);
-        compareTwo(initFrom, initTo);
-    }, [initFrom]);
-    useEffect(() => {
         setTo(initTo);
-        compareTwo(initFrom, initTo);
-    }, [initTo]);
+        cbCompare(initFrom, initTo);
+    }, [initFrom, initTo, cbCompare]);
+
+    
 
     const classes = useStyles();
 
@@ -133,7 +147,7 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
     function setValue(type, value, foucusOut=false) {
         if (type === 0) {
             if (foucusOut && to.length === 5 && value.length === 5) {
-                if (compareTwo(value, to)) {
+                if (cbCompare(value, to)) {
                     commitValue({from: to, to: value});
                     setFrom(to);
                     setTo(value);
@@ -144,7 +158,7 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
             setFrom(value);
         } else {
             if (foucusOut && from.length === 5 && value.length === 5) {
-                if (compareTwo(from, value)) {
+                if (cbCompare(from, value)) {
                     commitValue({from: value, to: from});
                     setTo(from);
                     setFrom(value);
@@ -165,22 +179,6 @@ export default function TimelineTimeSlot({initFrom, initTo, commitValue, handleD
         } else {
             setValue(type, completeFixMachine(value), true);
         }
-    }
-
-    function compareTwo(lhs, rhs) {
-        if (lhs === "" || rhs === "") {
-            setDiff("0 hours and 0 minutes");
-            return false;
-        }
-        const lhsMin = lhs.slice(0,2), lhsSec = lhs.slice(-2);
-        const rhsMin = rhs.slice(0,2), rhsSec = rhs.slice(-2);
-        
-        if (lhsMin > rhsMin || (lhsMin == rhsMin && lhsSec > rhsSec)) {
-            calDiff(lhsMin, lhsSec, rhsMin, rhsSec);
-            return true;
-        }
-        calDiff(rhsMin, rhsSec, lhsMin, lhsSec);
-        return false;
     }
 
     function calDiff(lhsMin, lhsSec, rhsMin, rhsSec) {

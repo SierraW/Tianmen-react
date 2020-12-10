@@ -40,7 +40,7 @@ export function TimelineAllOngoingPage() {
             setLoading(false);
         }
         load();
-    }, []);
+    }, [now]);
 
     function handleReqDel(loc, docId) {
         if (loc === 2) {

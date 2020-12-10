@@ -36,6 +36,7 @@ export default function ProjectOverviewWidgetNewsList({ className }) {
                                         <a
                                             href={item.url}
                                             target="_blank"
+                                            rel="noopener noreferrer"
                                             className="text-dark-75 font-weight-bold text-hover-primary font-size-lg mb-1"
                                         >
                                             {item.title}

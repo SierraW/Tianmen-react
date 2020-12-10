@@ -54,7 +54,7 @@ export default function ProjectSubscriptionManagementAddOnTable({ pid, setEstAmo
         return function cleanup() {
             unsubscribe();
         }
-    }, [])
+    }, [pid, setEstAmount]);
 
     function addNewAddOn() {
         setShowInputModal(true);

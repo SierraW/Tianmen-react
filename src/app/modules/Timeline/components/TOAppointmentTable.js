@@ -50,7 +50,7 @@ export default function TimelineOngoingAppointmentTable({appointments, login, ha
                 <tr>
                     {
                         sortedAppointments.map((sp, index) => (
-                            <td key={index} scope="col">
+                            <td key={index}>
                                 <div className="d-flex flex-column">
                                     {
                                         sp.apps.map((app, index) => (

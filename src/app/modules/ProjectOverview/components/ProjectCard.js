@@ -39,10 +39,13 @@ export default function ProjectCard({ imgUri, name, type, roomId }) {
     }
 
     useEffect(() => {
-        em_mashaji(roomId).where("time", ">=", myTimestamp).onSnapshot(querySnapshot => {
+        var unsubscribe = em_mashaji(roomId).where("time", ">=", myTimestamp).onSnapshot(querySnapshot => {
             setUnreadCount(querySnapshot.size);
-        })
-    }, []);
+        });
+        return function cleanup() {
+            unsubscribe();
+        };
+    }, [myTimestamp, roomId]);
 
     function getMessageNotificationCountString() {
         if (unreadCount === 0) {

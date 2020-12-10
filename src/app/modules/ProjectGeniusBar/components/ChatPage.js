@@ -10,7 +10,6 @@ import PropTypes from "prop-types";
 
 
 export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
-
     const [messages, setMessages] = useState([]);
     const [inputMsg, setInputMsg] = useState("");
     var map = {};
@@ -53,7 +52,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     }
 
     useEffect(() => {
-        em_mashaji(roomId).orderBy("time").limit(100).onSnapshot((querySnapshot) => {
+        var unsubscribe = em_mashaji(roomId).orderBy("time").limit(100).onSnapshot((querySnapshot) => {
             var items = []
             querySnapshot.forEach((doc) => {
                 items.push({
@@ -66,12 +65,15 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
                 })
             })
             setMessages(items);
-        })
-    }, [])
+        });
+        return function cleanup() {
+            unsubscribe();
+        };
+    }, [roomId, uid]);
 
     function keyListner(e) {
         if (e.keyCode === 13 || e.keyCode === 17) {
-            map[e.keyCode] = e.type == 'keydown';
+            map[e.keyCode] = e.type === 'keydown';
         }
         if (e.keyCode === 13 && e.type === 'keydown') {
             if (map[17]) {
@@ -86,20 +88,20 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
     useEffect(() => {
         dispatch(cs.actions.setLastViewStamp(roomId));
         scrollToBottom();
-    }, [messages]);
+    }, [messages, dispatch, roomId]);
 
     function renderMessage(type, msgBody) {
         switch (type) {
-            case 1:
-                if (/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/.test(msgBody)) {
-                    return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} target="_blank" >{msgBody}</a></div>
+            case 2:
+                return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} target="_blank" rel="noopener noreferrer" ><img className="rounded img-fluid" src={msgBody} alt={msgBody}></img></a></div>
+            case 3:
+                return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} download>附件: {msgBody}</a></div>;
+            default:
+                if (/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+(:[0-9]+)?|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/.test(msgBody)) {
+                    return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} target="_blank" rel="noopener noreferrer" >{msgBody}</a></div>
                 } else {
                     return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px">{msgBody}</div>
                 }
-            case 2:
-                return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} target="_blank" ><img className="rounded img-fluid" src={msgBody} alt={msgBody}></img></a></div>
-            case 3:
-                return <div className="mt-2 rounded p-5 bg-light-success text-dark-50 font-weight-bold font-size-lg text-left max-w-400px"><a href={msgBody} download>附件: {msgBody}</a></div>;
         }
     }
 
@@ -206,7 +208,7 @@ export default function ChatPage({ roomName, roomId, uid, session, userInfo }) {
                                     <img alt="Pic" src={headUri(userInfo[message.sender])} />
                                 </div>
                                 <div>
-                                    <a href="#" className="text-dark-75 text-hover-primary font-weight-bold font-size-h6 mr-3">{nameString(userInfo[message.sender])}</a>
+                                    <span className="text-dark-75 text-hover-primary font-weight-bold font-size-h6 mr-3">{nameString(userInfo[message.sender])}</span>
                                     <span className="text-muted font-size-sm">{message.time}</span>
                                 </div>
                             </div>

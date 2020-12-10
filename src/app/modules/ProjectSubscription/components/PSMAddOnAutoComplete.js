@@ -61,7 +61,7 @@ export default function ProjectSubscriptionManagementAddOnAutoComplete({ pid, on
         if (coResObj) {
             setPrice(coResObj.price);
         }
-    }, [value])
+    }, [value, options])
 
     function addNewAddOn() {
         if (value) {

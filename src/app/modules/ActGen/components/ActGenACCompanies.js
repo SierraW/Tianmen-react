@@ -7,6 +7,10 @@ import PropTypes from "prop-types"
 
 const filter = createFilterOptions();
 
+ActGenAutoCompleteCompanies.propTypes = {
+    setCompany: PropTypes.func.isRequired
+}
+
 export default function ActGenAutoCompleteCompanies({ setCompany }) {
     const [open, setOpen] = React.useState(false);
     const [value, setValue] = React.useState(null);
@@ -46,7 +50,7 @@ export default function ActGenAutoCompleteCompanies({ setCompany }) {
 
     React.useEffect(() => {
         setCompany(value);
-    }, [value]);
+    }, [value, setCompany]);
 
     React.useEffect(() => {
         if (!open) {

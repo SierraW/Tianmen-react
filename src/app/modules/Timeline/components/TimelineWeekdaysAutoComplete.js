@@ -22,7 +22,11 @@ export default function TimelineWeekdaysAutoComplete({ weekdays, setWeekday }) {
                 let current = inputArr[i];
                 // The last element of our sorted subarray
                 let j = i-1; 
-                while ((j > -1) && (daysInWeek.findIndex(day => day === current) < daysInWeek.findIndex(day => day === inputArr[j]))) {
+                while (j > -1) {
+                    const inputDay = inputArr[j];
+                    if (daysInWeek.findIndex(day => day === current) >= daysInWeek.findIndex(day => day === inputDay)) {
+                        break;
+                    }
                     inputArr[j+1] = inputArr[j];
                     j--;
                 }
