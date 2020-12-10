@@ -200,14 +200,13 @@ export function TimelineReservationPage() {
                 }
                 output = cbGenerateTimeline(result);
             }
-            console.log("unexpected reload");
             setTimeline(output);
         });
 
         return function cleanup() {
             unsubscribe();
         };
-    }, [preferManager.user_login, cbGenerateTimeline])
+    }, [])
 
     useEffect(() => {
         if (!preferManager) {

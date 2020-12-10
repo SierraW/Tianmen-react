@@ -65,7 +65,7 @@ export const ProjectCreatorPage = ({ match }) => {
                 return user;
             }
         }));
-    }, [roomData, users]);
+    }, []);
 
     useEffect(() => {
         setSelectedUsers(users.filter(user => user.isSelected));
