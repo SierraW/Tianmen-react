@@ -58,14 +58,14 @@ export const ProjectCreatorPage = ({ match }) => {
     }, [user.user_session, match.params.id]);
 
     useEffect(() => {
-        setUsers(users.map(user => {
+        setUsers(u => u.map(user => {
             if (roomData.attendees.includes(parseInt(user.id))) {
                 return { ...user, isSelected: true };
             } else {
                 return user;
             }
         }));
-    }, []);
+    }, [roomData]);
 
     useEffect(() => {
         setSelectedUsers(users.filter(user => user.isSelected));

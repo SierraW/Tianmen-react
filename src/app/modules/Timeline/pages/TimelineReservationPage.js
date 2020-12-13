@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Zoom from '@material-ui/core/Zoom';
 import Button from '@material-ui/core/Button';
-import { em_tl, em_timeline, em_appointment } from "../../../../services/firebaseInit";
+import { em_tl, em_appointment } from "../../../../services/firebaseInit";
 import { formatDateMDY, formatDate, daysInWeek, month } from "../../../../services/datePrintingService";
 import Divider from '@material-ui/core/Divider';
 import TextField from '@material-ui/core/TextField';
@@ -83,56 +83,9 @@ export function TimelineReservationPage() {
         }
         return false;
     }, [appointmentMade]);
-    const cbGenerateTimeline = useCallback((mtls) => {
-        var output = {};
-        var avDate = [];
-        for (var i = 0; i < numberOfDaysAhead; i++) {
-            avDate.push(0);
-        }
-        mtls.forEach((timelineObj) => {
-            var result = [];
-            var excludesMap = {};
-            timelineObj.excludes.forEach(exclude => {
-                excludesMap[exclude.date] = exclude.timelines;
-            })
-            for (var i = 0; i < dateArr.length; i++) {
-                const date = dateArr[i];
-                const day = new Date(date);
-                day.setTime(day.getTime() + day.getTimezoneOffset() * 60 * 1000);
-                const weekday = daysInWeek[day.getDay()];
-                if (excludesMap[date]) {
-                    result.push(excludesMap[date]);
-                } else if (timelineObj.weekdays.includes(weekday)) {
-                    if (timelineObj.specialTimelines[weekday]) {
-                        result.push(timelineObj.specialTimelines[weekday]);
-                    } else {
-                        result.push(timelineObj.timelines);
-                    }
-                } else {
-                    result.push([]);
-                }
-                if (result[i].length > 0) {
-                    var fullyBooked = true;
-                    for (var j = 0; j < result[i].length; j++) {
-                        if (!cbCheckConfig(timelineObj.uid, date, result[i][j].from)) {
-                            fullyBooked = false;
-                            break;
-                        }
-                    }
-                    avDate[i] = fullyBooked ? 0 : 1;
-                }
-            }
-            output[timelineObj.uid] = result;
-        })
-        setAvaliableDate(avDate);
-        return output;
-
-
-    }, [cbCheckConfig, dateArr]);
     const cbAutoSelect = useCallback(() => {
-        console.log("unexpected auto selecte");
         const nextAVD = avaliableDates.findIndex(value => value === 1);
-        if (selectedDateIndex !== nextAVD) {
+        if (selectedDateIndex === -1 || avaliableDates[selectedDateIndex] === 0) {
             cbHandleSelectDay(nextAVD);
         }
     }, [cbHandleSelectDay, selectedDateIndex, avaliableDates]);
@@ -168,45 +121,66 @@ export function TimelineReservationPage() {
     }, [now, user.user_login, user.user_session]);
 
     useEffect(() => {
-        var db = em_tl;
-        if (preferManager.user_login !== false) {
-            db = em_timeline(preferManager.user_login);
-        }
-        var unsubscribe = db.onSnapshot((querySnapshot) => {
+        var unsubscribe = em_tl.onSnapshot((querySnapshot) => {
             var result = [];
-            var output = {};
-            if (preferManager.user_login === false) {
-                querySnapshot.forEach((doc) => {
-                    result.push({
-                        uid: doc.id,
-                        weekdays: doc.data().weekdays,
-                        timelines: doc.data().timelines,
-                        specialTimelines: doc.data().specialTimelines,
-                        excludes: doc.data().excludes
-                    })
+            querySnapshot.forEach((doc) => {
+                result.push({
+                    uid: doc.id,
+                    weekdays: doc.data().weekdays,
+                    timelines: doc.data().timelines,
+                    specialTimelines: doc.data().specialTimelines,
+                    excludes: doc.data().excludes
                 })
-                output = cbGenerateTimeline(result);
-            } else {
-                setAvaliableDate([]);
-                var doc = querySnapshot;
-                if (doc.exists) {
-                    result.push({
-                        uid: doc.id,
-                        weekdays: doc.data().weekdays,
-                        timelines: doc.data().timelines,
-                        specialTimelines: doc.data().specialTimelines,
-                        excludes: doc.data().excludes
-                    })
-                }
-                output = cbGenerateTimeline(result);
+            })
+
+            var output = {};
+            var avDate = [];
+            for (var i = 0; i < numberOfDaysAhead; i++) {
+                avDate.push(0);
             }
+            result.forEach((timelineObj) => {
+                var myResult = [];
+                var excludesMap = {};
+                timelineObj.excludes.forEach(exclude => {
+                    excludesMap[exclude.date] = exclude.timelines;
+                })
+                for (var i = 0; i < dateArr.length; i++) {
+                    const date = dateArr[i];
+                    const day = new Date(date);
+                    day.setTime(day.getTime() + day.getTimezoneOffset() * 60 * 1000);
+                    const weekday = daysInWeek[day.getDay()];
+                    if (excludesMap[date]) {
+                        myResult.push(excludesMap[date]);
+                    } else if (timelineObj.weekdays.includes(weekday)) {
+                        if (timelineObj.specialTimelines[weekday]) {
+                            myResult.push(timelineObj.specialTimelines[weekday]);
+                        } else {
+                            myResult.push(timelineObj.timelines);
+                        }
+                    } else {
+                        myResult.push([]);
+                    }
+                    if (myResult[i].length > 0) {
+                        var fullyBooked = true;
+                        for (var j = 0; j < myResult[i].length; j++) {
+                            if (!cbCheckConfig(timelineObj.uid, date, myResult[i][j].from)) {
+                                fullyBooked = false;
+                                break;
+                            }
+                        }
+                        avDate[i] = fullyBooked ? 0 : 1;
+                    }
+                }
+                output[timelineObj.uid] = myResult;
+            })
+            setAvaliableDate(avDate);
             setTimeline(output);
         });
 
         return function cleanup() {
             unsubscribe();
         };
-    }, [])
+    }, [cbCheckConfig, dateArr])
 
     useEffect(() => {
         if (!preferManager) {
